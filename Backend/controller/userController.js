@@ -1,6 +1,7 @@
 const User = require("../models/userSchema");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
 
 
 const createNewUser = async (req, res) => {
@@ -59,4 +60,90 @@ const loginUser = async (req, res) => {
     });
 };
 
-module.exports = { createNewUser, loginUser };
+
+const getUserCredentials = async (req, res) => {
+    // retrive the id from the url 
+    const userId = req.params.userId;
+
+    // check an Id follows object constraints or not
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+        return res.status(400).send("User Id Format is wrong, try with correct Id format");
+    }
+
+
+    // retreive the user with given userId
+    const existingUser = await User.findById({ _id: userId });
+    if (!existingUser) {
+        return res.status(401).send(`user with Id ${userId} does'nt exist`);
+    }
+
+    // send the User Credentials to the user 
+    existingUser._id = undefined;
+    existingUser.password = undefined;
+    res.status(200).json({
+        msg: "These are the user credentials",
+        existingUser
+    })
+
+};
+
+const updateUserDetails = async (req, res) => {
+
+    // reteive the ID from URL
+    const userId = req.params.userId;
+
+    // check the ID is in correct format or not
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+        return res.status(400).send("User Id Format is wrong, try with correct Id format");
+    }
+
+    // check the input data 
+    const { firstname, lastname, email, password } = req.body;
+    if (!(firstname && lastname && email && password)) {
+        return res.status(401).send("Please provide all credentials");
+    }
+
+    // encrypt the password
+    const salt = bcrypt.genSaltSync(10);
+    const hashPassword = bcrypt.hashSync(password, salt);
+
+
+    // check userId exist or not , if yes overwrite with new Credentials
+    const updateUser = await User.findByIdAndUpdate(userId, { firstname, lastname, email, password: hashPassword }, {
+        new: true,
+        overwrite: true
+    })
+    if (!updateUser) {
+        return res.status(401).send("User with this Id does'nt exist");
+    }
+
+    // send response
+    return res.status(200).json({
+        msg: "user credentials got updated",
+        updateUser
+    });
+};
+
+const deleteUserFromDatabase = async (req, res) => {
+    // reteive the ID from URL
+    const userId = req.params.userId;
+
+    // check the ID is in correct format or not
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+        return res.status(400).send("User Id Format is wrong, try with correct Id format");
+    }
+
+    // delete the user completly from database 
+    const deletedUser = await User.findByIdAndDelete(userId);
+    if (!deletedUser) {
+        return res.status(401).send("User with this Id does'nt exist");
+    }
+
+    // send the response 
+    res.status(200).json({
+        msg: "this user got deleted completely",
+        deletedUser
+    })
+};
+
+module.exports = { createNewUser, loginUser, getUserCredentials, updateUserDetails, deleteUserFromDatabase };
