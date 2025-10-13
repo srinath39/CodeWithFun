@@ -2,6 +2,7 @@ const User = require("../models/userSchema");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
+const HttpError = require("../models/http-Error");
 
 
 const createNewUser = async (req, res) => {
@@ -9,12 +10,12 @@ const createNewUser = async (req, res) => {
     const { firstname, lastname, email, password } = req.body;
     // check whether all data exist or not
     if (!(firstname && lastname && email && password)) {
-        return res.status(401).send("Please all the details");
+        return next(new HttpError("Please all the details", 401));
     }
     // check if the user is already exist in the DB
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-        return res.status(401).send("User email already Exist");
+        return next(new HttpError("User email already Exist", 401));
     }
     // encrypt the password
     const salt = bcrypt.genSaltSync(10);
@@ -33,19 +34,19 @@ const loginUser = async (req, res) => {
 
     // check all data exist or not 
     if (!(email && password)) {
-        return res.status(401).send("Please provide all credentials");
+        return next(new HttpError("Please provide all credentials", 401));
     }
 
     // check user with eamil exist
     const existingUser = await User.findOne({ email });
     if (!existingUser) {
-        return res.status(401).send("User with this email does'nt exist, please create new account");
+        return next(new HttpError("User with this email does'nt exist, please create new account", 401));
     }
 
     // check existing user password matched with given password
     const isPasswordMatched = bcrypt.compareSync(password, existingUser.password);
     if (!isPasswordMatched) {
-        return res.status(401).send("Password does'nt match with the Given email, please retry with correct password");
+        return next(new HttpError("Password does'nt match with the Given email, please retry with correct password", 401));
     }
 
     // generate a JWT token for user and send it 
@@ -67,14 +68,14 @@ const getUserCredentials = async (req, res) => {
 
     // check an Id follows object constraints or not
     if (!mongoose.Types.ObjectId.isValid(userId)) {
-        return res.status(400).send("User Id Format is wrong, try with correct Id format");
+        return next(new HttpError("User Id Format is wrong, try with correct Id format", 400));
     }
 
 
     // retreive the user with given userId
     const existingUser = await User.findById({ _id: userId });
     if (!existingUser) {
-        return res.status(401).send(`user with Id ${userId} does'nt exist`);
+        return next(new HttpError(`user with Id ${userId} does'nt exist`, 401));
     }
 
     // send the User Credentials to the user 
@@ -94,13 +95,14 @@ const updateUserDetails = async (req, res) => {
 
     // check the ID is in correct format or not
     if (!mongoose.Types.ObjectId.isValid(userId)) {
-        return res.status(400).send("User Id Format is wrong, try with correct Id format");
+        return next(new HttpError("User Id Format is wrong, try with correct Id format", 400));
     }
 
     // check the input data 
     const { firstname, lastname, email, password } = req.body;
+    console.log(req.body);
     if (!(firstname && lastname && email && password)) {
-        return res.status(401).send("Please provide all credentials");
+        return next(new HttpError("Please provide all credentials", 401));
     }
 
     // encrypt the password
@@ -114,7 +116,7 @@ const updateUserDetails = async (req, res) => {
         overwrite: true
     })
     if (!updateUser) {
-        return res.status(401).send("User with this Id does'nt exist");
+        return next(new HttpError("User with this Id does'nt exist", 401));
     }
 
     // send response
@@ -130,13 +132,13 @@ const deleteUserFromDatabase = async (req, res) => {
 
     // check the ID is in correct format or not
     if (!mongoose.Types.ObjectId.isValid(userId)) {
-        return res.status(400).send("User Id Format is wrong, try with correct Id format");
+        return next(new HttpError("User Id Format is wrong, try with correct Id format", 400));
     }
 
     // delete the user completly from database 
     const deletedUser = await User.findByIdAndDelete(userId);
     if (!deletedUser) {
-        return res.status(401).send("User with this Id does'nt exist");
+        return next(new HttpError("User with this Id does'nt exist", 401));
     }
 
     // send the response 

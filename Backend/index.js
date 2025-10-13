@@ -3,6 +3,11 @@ const app = express();
 const { DBConnection } = require("./database/db.js");
 const checkAuth = require("./middleware/checkAuth.js");
 const userRoute = require("./routes/userRoute.js");
+const cors = require("cors");
+
+
+app.use(cors());
+
 
 app.listen(3000, () => {
         console.log('Server running on port number 3000');
@@ -17,6 +22,12 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/user', userRoute);
 
-app.use(checkAuth);    // this is used only after Registration and login or just after login 
+app.use((error, req, res, next) => {
+        if (!res.headerSent && error) {
+                return res.status(error.code || 500).json({ message: error.message || 'An unknown error occured' });
+        }
+});
+
+// app.use(checkAuth);    // this is used only after Registration and login or just after login 
 
 
