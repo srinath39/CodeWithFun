@@ -4,6 +4,7 @@ const { DBConnection } = require("./database/db.js");
 const checkAuth = require("./middleware/checkAuth.js");
 const userRoute = require("./routes/userRoute.js");
 const problemRoute = require("./routes/problemRoute.js");
+const compilerRoute = require("./routes/compilerRoute.js");
 const cors = require("cors");
 
 
@@ -24,6 +25,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/user', userRoute);
 
 app.use('/problem', problemRoute);
+
+app.use('/compiler', compilerRoute);
 
 app.use((error, req, res, next) => {
         if (!res.headerSent && error) {
