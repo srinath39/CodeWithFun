@@ -20,7 +20,7 @@ const executeCode = (filePath, input) => {
     const outputPath = path.join(dirCodes, `${fileName}.exe`);
 
     // execute the code
-    return new Promise((resolve, reject) => {     // Promise  maintains atomocity , and wraps asynchronus operations in it 
+    return new Promise((resolve, reject) => {     // Promise  maintains atamocity , and wraps asynchronus operations in it 
         // exec is an higher order function which is an async operation 
         exec(`cd ${fileDir} && g++ ${fileNameWithExt} -o ${outputPath} && cd ${dirCodes} && echo ${input} | ${fileName}.exe`, (error, stdout, stderr) => {
             if (error) {

@@ -1,28 +1,30 @@
 const { generateFileWithCode } = require("../Utils/fileUtils/generateFile");
 const { executeCode } = require("../Utils/fileUtils/executeCode");
 const HttpError = require("../models/http-Error");
+const languagesMap = require("../Utils/Language/getAllLangauges");
 
 
-const runCodeWithCompiler = async (req, res,next) => {
-    const { code, language, input } = req.body;
+const runCodeWithCompiler = async (req, res, next) => {
+    const { code, languageExt, input } = req.body;
 
     // data validation
     // if user have'nt choosen any language , by default it should be any language example : c++
-    if (!language) {
-        language = 'C++';
+    if (!languageExt) {
+        languageExt = 'cpp';
     }
     // if no code is provided , we need to throw an error
     if (!code) {
         return next(new HttpError("The code is Empty, please provide the code", 404));
     }
 
-    if(!input){
-        input='';
+    if (!input) {
+        input = '';
     }
 
     // Automation in creating a file(Language Specfic) in codes folder and copying the code in it and return the file path 
     try {
-        const filePath = generateFileWithCode(language,getLanguageExtWithLanguageName(language), code);
+        const filePath = generateFileWithCode(languagesMap.get(languageExt), languageExt, code);
+        // this execution need to different for different Lanugages 
         const output = await executeCode(filePath, input);
         return res.status(200).json({
             CodeOutput: output
@@ -31,23 +33,5 @@ const runCodeWithCompiler = async (req, res,next) => {
         return next(new HttpError(error.message, error.errorCode));
     }
 };
-
-const getLanguageExtWithLanguageName = (language) => {
-    let lanExt;
-    switch (language) {
-        case 'C++':
-            lanExt = 'cpp';
-            break;
-        case 'Java':
-            lanExt = 'java';
-            break;
-        case 'Python':
-            lanExt = 'py';
-            break;
-        default:
-            lanExt = 'cpp';
-    }
-    return lanExt;
-}
 
 module.exports = { runCodeWithCompiler };   
