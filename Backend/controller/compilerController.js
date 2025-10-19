@@ -25,7 +25,7 @@ const runCodeWithCompiler = async (req, res, next) => {
     try {
         const filePath = generateFileWithCode(languagesMap.get(languageExt), languageExt, code);
         // this execution need to different for different Lanugages 
-        const output = await executeCode(filePath, input);
+        const output = await executeCode(filePath, input, languageExt);
         return res.status(200).json({
             CodeOutput: output
         });

@@ -1,7 +1,7 @@
-const express= require("express");
-const router=express.Router();
-const {runCodeWithCompiler}=require('../controller/compilerController');
+const express = require("express");
+const router = express.Router();
+const { runCodeWithCompiler } = require('../controller/compilerController');
 
-router.post('/run',runCodeWithCompiler);
+router.post('/run', runCodeWithCompiler);
 
-module.exports =router;
+module.exports = router;

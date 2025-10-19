@@ -12,7 +12,7 @@ if (!fs.existsSync(dirCodes)) {
 
 const generateFileWithCode = (language, languageExtension, code) => {
 
-    // creating a file name 
+    // we need to keep the file name same as problem title ,for now just keep the uniqueId as a file name 
     const jobId = uniqueName();
     const fileName = `${jobId}-${language}.${languageExtension}`;
 
