@@ -11,7 +11,7 @@ if (!fs.existsSync(dirCodes)) {
     fs.mkdirSync(dirCodes, { recursive: true });   // {recursive: "true"}
 }
 
-const executeCode = (filePath) => {
+const executeCode = (filePath, input) => {
 
     // creating a file name from filePath
     const fileDir = path.dirname(filePath);
@@ -19,12 +19,10 @@ const executeCode = (filePath) => {
     const fileName = fileNameWithExt.split('.')[0];
     const outputPath = path.join(dirCodes, `${fileName}.exe`);
 
-    console.log(`cd ${fileDir} && g++ ${fileNameWithExt} -o ${outputPath} && cd ${dirCodes} && ${fileName}.exe`);
-
     // execute the code
     return new Promise((resolve, reject) => {     // Promise  maintains atomocity , and wraps asynchronus operations in it 
         // exec is an higher order function which is an async operation 
-        exec(`cd ${fileDir} && g++ ${fileNameWithExt} -o ${outputPath} && cd ${dirCodes} && ${fileName}.exe`, (error, stdout, stderr) => {
+        exec(`cd ${fileDir} && g++ ${fileNameWithExt} -o ${outputPath} && cd ${dirCodes} && echo ${input} | ${fileName}.exe`, (error, stdout, stderr) => {
             if (error) {
                 reject({ type: "SYSTEM_ERROR", message: "Execution Failed, Something went wrong while executing command", errorOutput: error, errorCode: 500 });    // failure , throws an Error 
             }

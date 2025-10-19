@@ -4,7 +4,7 @@ const HttpError = require("../models/http-Error");
 
 
 const runCodeWithCompiler = async (req, res,next) => {
-    const { code, language } = req.body;
+    const { code, language, input } = req.body;
 
     // data validation
     // if user have'nt choosen any language , by default it should be any language example : c++
@@ -16,10 +16,14 @@ const runCodeWithCompiler = async (req, res,next) => {
         return next(new HttpError("The code is Empty, please provide the code", 404));
     }
 
+    if(!input){
+        input='';
+    }
+
     // Automation in creating a file(Language Specfic) in codes folder and copying the code in it and return the file path 
     try {
         const filePath = generateFileWithCode(language,getLanguageExtWithLanguageName(language), code);
-        const output = await executeCode(filePath);
+        const output = await executeCode(filePath, input);
         return res.status(200).json({
             CodeOutput: output
         });
