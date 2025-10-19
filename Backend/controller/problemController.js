@@ -6,7 +6,7 @@ const HARD_LEVEL = 2;
 
 // get All problems 
 
-const getAllProblems = async (req, res) => {
+const getAllProblems = async (req, res, next) => {
     // get All problems 
     try {
         const allProblems = await ProblemModel.find({});
@@ -27,7 +27,7 @@ const getAllProblems = async (req, res) => {
     });
 };
 
-const getProblemById = async (req, res) => {
+const getProblemById = async (req, res, next) => {
     //retrieve the id from URL
     const problemId = req.params.problemId;
 
@@ -49,7 +49,7 @@ const getProblemById = async (req, res) => {
 };
 
 
-const createNewCodingProblem = async (req, res) => {
+const createNewCodingProblem = async (req, res, next) => {
     // load the data 
     const { title, description, difficulty, testCases } = req.body;
 
@@ -86,7 +86,7 @@ const validateTestCases = (testCases) => {
     return false;
 };
 
-const updateCodingProblem = async (req, res) => {
+const updateCodingProblem = async (req, res, next) => {
     // retrieve the Id 
     const problemId = req.params.problemId;
 
@@ -114,7 +114,7 @@ const updateCodingProblem = async (req, res) => {
     });
 };
 
-const deleteCodingProblem = async (req, res) => {
+const deleteCodingProblem = async (req, res, next) => {
     // retrieve the Id 
     const problemId = req.params.problemId;
 
@@ -137,15 +137,15 @@ const deleteCodingProblem = async (req, res) => {
 };
 
 
-const addNewTestCaseByProblemId = (req, res) => {
+const addNewTestCaseByProblemId = (req, res, next) => {
 
 };
 
-const updateTestCaseByProblemId = (req, res) => {
+const updateTestCaseByProblemId = (req, res, next) => {
 
 };
 
-const deleteTestCaseByProblemId = (req, res) => {
+const deleteTestCaseByProblemId = (req, res, next) => {
 
 };
 

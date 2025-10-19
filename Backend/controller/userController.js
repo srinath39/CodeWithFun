@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 const HttpError = require("../models/http-Error");
 
 
-const createNewUser = async (req, res) => {
+const createNewUser = async (req, res, next) => {
     // get all the data
     const { firstname, lastname, email, password } = req.body;
     // check whether all data exist or not
@@ -28,7 +28,7 @@ const createNewUser = async (req, res) => {
     }
 };
 
-const loginUser = async (req, res) => {
+const loginUser = async (req, res, next) => {
     // get all the data
     const { email, password } = req.body;
 
@@ -62,7 +62,7 @@ const loginUser = async (req, res) => {
 };
 
 
-const getUserCredentials = async (req, res) => {
+const getUserCredentials = async (req, res, next) => {
     // retrive the id from the url 
     const userId = req.params.userId;
 
@@ -88,7 +88,7 @@ const getUserCredentials = async (req, res) => {
 
 };
 
-const updateUserDetails = async (req, res) => {
+const updateUserDetails = async (req, res, next) => {
 
     // reteive the ID from URL
     const userId = req.params.userId;
@@ -126,7 +126,7 @@ const updateUserDetails = async (req, res) => {
     });
 };
 
-const deleteUserFromDatabase = async (req, res) => {
+const deleteUserFromDatabase = async (req, res, next) => {
     // reteive the ID from URL
     const userId = req.params.userId;
 

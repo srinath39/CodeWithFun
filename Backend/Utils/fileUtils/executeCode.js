@@ -14,22 +14,25 @@ if (!fs.existsSync(dirCodes)) {
 const executeCode = (filePath) => {
 
     // creating a file name from filePath
-    const fileDir=path.dirname(filePath);
+    const fileDir = path.dirname(filePath);
     const fileNameWithExt = path.basename(filePath);
-    const fileName= fileNameWithExt.split('.')[0];
-    const outputPath = path.join(dirCodes,`${fileName}.exe`);
+    const fileName = fileNameWithExt.split('.')[0];
+    const outputPath = path.join(dirCodes, `${fileName}.exe`);
+
+    console.log(`cd ${fileDir} && g++ ${fileNameWithExt} -o ${outputPath} && cd ${dirCodes} && ${fileName}.exe`);
 
     // execute the code
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {     // Promise  maintains atomocity , and wraps asynchronus operations in it 
+        // exec is an higher order function which is an async operation 
         exec(`cd ${fileDir} && g++ ${fileNameWithExt} -o ${outputPath} && cd ${dirCodes} && ${fileName}.exe`, (error, stdout, stderr) => {
             if (error) {
-                reject({ message: "Execution Failed", details: error.message });
+                reject({ type: "SYSTEM_ERROR", message: "Execution Failed, Something went wrong while executing command", errorOutput: error, errorCode: 500 });    // failure , throws an Error 
             }
             if (stderr) {
-                reject(stderr);
+                reject({ type: "CODE ERROR", message: "A compilation or Runtime Error has been occured, please check the code", errorOutput: stderr, errorCode: 404 });    // failure , throws an Error 
             }
-            if(stdout){
-                resolve(stdout);
+            if (stdout) {
+                resolve(stdout);   // success , Returns the output 
             }
         });
     });
