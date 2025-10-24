@@ -40,8 +40,10 @@ const getCommandForASpecificLanguage = (filePath, input, languageExt) => {
 
     switch (languageExt) {
         case 'java':
-            outputPath = path.join(dirCodes, `${fileName}.class`);
-            outputCommand = `cd ${fileDir} && javac ${fileNameWithExt} -d ${outputPath} && cd ${dirCodes} && echo ${input} | java ${fileName}`;
+            // No longer the  class Name and the file name need to be the same (As java version 11 or above doesn't require file to be compiled we can directly run the file using filename.java )
+            // outputPath = path.join(dirCodes, `${fileName}.class`);
+            // outputCommand = `cd ${fileDir} && javac ${fileNameWithExt} -d ${outputPath} && cd ${dirCodes} && echo ${input} | java ${fileName}`;
+            outputCommand = `cd ${fileDir} && echo ${input} | java ${fileNameWithExt}`;
             break;
         case 'py':
             outputCommand = `cd ${fileDir} && echo ${input} | python ${fileNameWithExt}`;
@@ -51,7 +53,6 @@ const getCommandForASpecificLanguage = (filePath, input, languageExt) => {
             outputCommand = `cd ${fileDir} && g++ ${fileNameWithExt} -o ${outputPath} && cd ${dirCodes} && echo ${input} | ${fileName}.exe`;
             break;
     }
-    console.log(outputCommand);
     return outputCommand;
 };
 

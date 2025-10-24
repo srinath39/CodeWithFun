@@ -1,8 +1,9 @@
 const HttpError = require("../models/http-Error");
 const ProblemModel = require("../models/problemSchema");
-const EASY_LEVEL = 0;
-const MEDIUM_LEVEL = 1;
-const HARD_LEVEL = 2;
+const mongoose = require("mongoose");
+// const EASY_LEVEL = 0;
+// const MEDIUM_LEVEL = 1;        we can configure this in Frontend 
+// const HARD_LEVEL = 2;
 
 // get All problems 
 
@@ -51,10 +52,10 @@ const getProblemById = async (req, res, next) => {
 
 const createNewCodingProblem = async (req, res, next) => {
     // load the data 
-    const { title, description, difficulty, testCases } = req.body;
+    const { title, problemDescription, difficult, testCases } = req.body;
 
     // validate the input 
-    if (!(title && description && difficulty && validateTestCases(testCases))) {
+    if (!(title && problemDescription && difficult && validateTestCases(testCases))) {
         return next(new HttpError("please provide entire problem and test data", 400));
     }
 
@@ -65,7 +66,7 @@ const createNewCodingProblem = async (req, res, next) => {
     }
 
     // create the entry in the Database and if successful return it as a json data 
-    const newProblem = await ProblemModel.create({ title, description, difficulty, testCases });
+    const newProblem = await ProblemModel.create({ title, problemDescription, difficult, testCases });
     if (newProblem) {
         return res.status(200).json(newProblem);
     }
@@ -75,9 +76,9 @@ const createNewCodingProblem = async (req, res, next) => {
 
 const validateTestCases = (testCases) => {
     if (testCases.length >= 2) {
-        testCases.every(testCase => {    //  If any object returns false, every() immediately stops and returns false. Only if all objects return true will every() return true.
+        return testCases.every(testCase => {    //  If any object returns false, every() immediately stops and returns false. Only if all objects return true will every() return true.
             const { input, expectedOutput, testCaseDescription, isSample } = testCase;
-            if (!(input && expectedOutput && testCaseDescription && isSample)) {
+            if (!(input && expectedOutput)) {
                 return false;
             }
             return true;
@@ -91,25 +92,25 @@ const updateCodingProblem = async (req, res, next) => {
     const problemId = req.params.problemId;
 
     // check the ID is in correct format or not
-    if (!mongoose.Types.ObjectId.isValid(userId)) {
+    if (!mongoose.Types.ObjectId.isValid(problemId)) {
         return next(new HttpError("problem Id Format is wrong, try with correct Id format", 400));
     }
 
     // validate the data
-    const { title, description, difficulty } = req.body;
-    if (!(title && description && difficulty)) {
+    const { title, problemDescription, difficult } = req.body;
+    if (!(title && problemDescription && difficult)) {
         return next(new HttpError("please provide entire problem data", 400));
     }
 
     // find the problem with Id and update the changes 
-    const updatedProblem = await ProblemModel.findByIdAndUpdate(problemId, { $set: { title, description, difficulty } }, { new: true, runValidators: true });
+    const updatedProblem = await ProblemModel.findByIdAndUpdate(problemId, { $set: { title, problemDescription, difficult } }, { new: true, runValidators: true });
     if (!updatedProblem) {
         return next(new HttpError(`Problem with ${problemId} Does'nt exist`, 400));
     }
 
     //send the data
     return res.status(200).json({
-        msg: "Problem got updated successdully",
+        msg: "Problem got updated successfully",
         updatedProblem
     });
 };

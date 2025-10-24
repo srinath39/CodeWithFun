@@ -34,4 +34,26 @@ const runCodeWithCompiler = async (req, res, next) => {
     }
 };
 
-module.exports = { runCodeWithCompiler };   
+
+const submitProblemCode = (req, res, next) => {
+    const problemId = req.params.problemId;
+
+    // check the id follows correct format or not 
+    if (!mongoose.Types.ObjectId.isValid(problemId)) {
+        return next(new HttpError("problem Id Format is wrong, try with correct Id format", 400));
+    }
+
+    const {languageExt, code} = req.body;
+    // if user have'nt choosen any language , by default it should be any language example : c++
+    if (!languageExt) {
+        languageExt = 'cpp';
+    }
+    // if no code is provided , we need to throw an error
+    if (!code) {
+        return next(new HttpError("The code is Empty, please provide the code", 404));
+    }
+    
+    
+};
+
+module.exports = { runCodeWithCompiler, submitProblemCode };  

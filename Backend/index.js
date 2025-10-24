@@ -5,7 +5,7 @@ const checkAuth = require("./middleware/checkAuth.js");
 const userRoute = require("./routes/userRoute.js");
 const problemRoute = require("./routes/problemRoute.js");
 const languageRoute = require("./routes/languageRoute.js");
-const compilerRoute = require("./routes/compilerRoute.js");
+const codeExecutionRoute = require("./routes/codeExecutionRoute.js");
 const cors = require("cors");
 
 
@@ -29,7 +29,9 @@ app.use('/problem', problemRoute);
 
 app.use('/languages', languageRoute);
 
-app.use('/compiler', compilerRoute);
+app.use('/code', codeExecutionRoute);
+
+
 
 app.use((error, req, res, next) => {
         if (!res.headerSent && error) {
