@@ -1,22 +1,12 @@
-const path = require("path");
-const fs = require("fs");
 const { exec } = require("child_process");  // its an Api to talk with CMD in local system 
+const dotenv = require("dotenv");
+dotenv.config();
 
-
-// Automation in creating a Directory for file storage
-const dirCodes = path.join(__dirname, 'executableCodeFiles');
-
-// ONly if the directory does'nt exit create it 
-if (!fs.existsSync(dirCodes)) {
-    fs.mkdirSync(dirCodes, { recursive: true });   // {recursive: "true"}
-}
-
-const executeCode = (filePath, input, languageExt) => {
-    const languageSpecificCommand = getCommandForASpecificLanguage(filePath, input, languageExt);
+const executeCode = (input, languageSpecificCommand) => {
     // execute the code
     return new Promise((resolve, reject) => {     // Promise  maintains atamocity , and wraps asynchronus operations in it 
         // exec is an higher order function which is an async operation 
-        exec(languageSpecificCommand, (error, stdout, stderr) => {
+        exec(languageSpecificCommand.replace(process.env.INPUT_PLACEHOLDER, input), (error, stdout, stderr) => {
             if (error) {
                 reject({ type: "SYSTEM_ERROR", message: "Execution Failed, Something went wrong while executing command", errorOutput: error, errorCode: 500 });    // failure , throws an Error 
             }
@@ -28,32 +18,6 @@ const executeCode = (filePath, input, languageExt) => {
             }
         });
     });
-};
-
-const getCommandForASpecificLanguage = (filePath, input, languageExt) => {
-    // creating a file name from filePath
-    const fileDir = path.dirname(filePath);
-    const fileNameWithExt = path.basename(filePath);
-    const fileName = fileNameWithExt.split('.')[0];
-    let outputPath;
-    let outputCommand;
-
-    switch (languageExt) {
-        case 'java':
-            // No longer the  class Name and the file name need to be the same (As java version 11 or above doesn't require file to be compiled we can directly run the file using filename.java )
-            // outputPath = path.join(dirCodes, `${fileName}.class`);
-            // outputCommand = `cd ${fileDir} && javac ${fileNameWithExt} -d ${outputPath} && cd ${dirCodes} && echo ${input} | java ${fileName}`;
-            outputCommand = `cd ${fileDir} && echo ${input} | java ${fileNameWithExt}`;
-            break;
-        case 'py':
-            outputCommand = `cd ${fileDir} && echo ${input} | python ${fileNameWithExt}`;
-            break;
-        default:  // cpp 
-            outputPath = path.join(dirCodes, `${fileName}.exe`);
-            outputCommand = `cd ${fileDir} && g++ ${fileNameWithExt} -o ${outputPath} && cd ${dirCodes} && echo ${input} | ${fileName}.exe`;
-            break;
-    }
-    return outputCommand;
 };
 
 module.exports = { executeCode };

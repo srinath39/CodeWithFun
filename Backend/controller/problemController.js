@@ -38,7 +38,7 @@ const getProblemById = async (req, res, next) => {
     }
 
     // check if the problemId exist , if yes, return the problem with test cases 
-    const codingProblem = await findById({ _id: problemId });
+    const codingProblem = await ProblemModel.findById({ _id: problemId });
     if (!codingProblem) {
         return next(new HttpError("Problem with this Id does'nt exist", 404));
     }
@@ -125,7 +125,7 @@ const deleteCodingProblem = async (req, res, next) => {
     }
 
     // delete the user completly from database 
-    const deletedProblem = await User.findByIdAndDelete(problemId);
+    const deletedProblem = await ProblemModel.findByIdAndDelete(problemId);
     if (!deletedProblem) {
         return next(new HttpError(`Problem with ${problemId} Does'nt exist`, 401));
     }

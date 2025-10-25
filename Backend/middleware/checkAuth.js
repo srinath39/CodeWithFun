@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const dotenv=require("dotenv");
+const dotenv = require("dotenv");
 dotenv.config();
 
 const verfiyUser = (req, res, next) => {
@@ -10,10 +10,10 @@ const verfiyUser = (req, res, next) => {
         if (!token) {
             throw new Error("Authentication failed !");
         }
-        req.userData = jwt.verify(token,process.env.SECRET);
+        req.userData = jwt.verify(token, process.env.SECRET);
         next();
     } catch (err) {
         next(err);
     }
 }
-module.exports=verfiyUser;
+module.exports = verfiyUser;

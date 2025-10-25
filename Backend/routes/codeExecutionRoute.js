@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { runCodeWithCompiler , submitProblemCode} = require('../controller/ExecutionController');
+const { runCodeWithCompiler, submitProblemCode } = require('../controller/ExecutionController');
 
 router.post('/run', runCodeWithCompiler);
 
