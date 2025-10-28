@@ -11,21 +11,19 @@ const getAllProblems = async (req, res, next) => {
     // get All problems 
     try {
         const allProblems = await ProblemModel.find({});
-    } catch (err) {
+        if (!allProblems.length) {
+            // No problems found
+            return res.status(200).send("No problems found");
+        }
+        // if problems exist send them in json format 
+        return res.status(200).json(
+           { allProblems: allProblems.map((problem) => problem.toObject({ getters: true })) }    // converts the objects by adding extra entry as "id" equivalent to "_id"
+        );
+    }
+    catch (err) {
         //when something goes wrong while retreving 
         return next(new HttpError(err.message, 500));
     }
-
-    if (!allProblems.length) {
-        // No problems found
-        return res.status(200).send("No problems found");
-    }
-
-    // if problems exist send them in json format 
-    return res.status(200).json({
-        msg: "All problems are retrieved",
-        allProblems
-    });
 };
 
 const getProblemById = async (req, res, next) => {

@@ -1,21 +1,34 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 
 import ProblemCard from '../components/ProblemCard';
 const DSAProblems = () => {
 
-    // Use State - Re-rendering is needed here 
-    // fetching of problems need to be done here
+    const [dsaProblems, setDsaProblems] = useState([]);
 
     const navigate = useNavigate();
 
-    const problems = [
-        { id: 1, title: "Two Sum", difficulty: "Easy" },
-        { id: 2, title: "Longest Substring Without Repeating Characters", difficulty: "Medium" },
-        { id: 3, title: "Median of Two Sorted Arrays", difficulty: "Hard" },
-        { id: 4, title: "Valid Parentheses", difficulty: "Easy" },
-        { id: 5, title: "Merge Intervals", difficulty: "Medium" },
-        { id: 6, title: "Word Ladder", difficulty: "Hard" },
-    ];
+    useEffect(() => {  // this will be running twice , if we are in Strict Mode ( Development)
+        const fetchDSAProblems = async () => {
+            try {
+                const response = await fetch(
+                    'http://localhost:3000/problem/all'
+                );
+                const dataFetched = await response.json();
+                if (!response.ok) {
+                    throw new Error(dataFetched.message | "All problems cannot be fetched");
+                }
+                const problemsRetrieved = dataFetched.allProblems;
+                // update the state 
+                setDsaProblems([...problemsRetrieved]);   // push all the array values in a new Array 
+            } catch (err) {
+                // Handle 4XX and 5XX errors in Fronted ( Create seperate UI for these)
+                console.log(err.message);
+            }
+        };
+        fetchDSAProblems();
+    }, []);
+
 
     const handleCardClick = (problem) => {
         navigate(`/problem/${problem.id}`);
@@ -25,18 +38,23 @@ const DSAProblems = () => {
         <div className="min-h-screen bg-gray-100 p-10">
 
             <div className="max-w-3xl mx-auto">
-                {problems.map((problem) => (
+                {dsaProblems.map((problem) => (
                     <ProblemCard
                         key={problem.id}
-                        title={problem.title}
-                        difficulty={problem.difficulty}
-                        onClick={() => handleCardClick(problem)}
+                        problemData={problem}
+                        onClick={handleCardClick}
                     />
                 ))}
             </div>
         </div>
     );
 
+    // Entire Problem 
+    // id 
+    // title
+    // problemDescription
+    // difficult
+    // testCases 
 };
 
 export default DSAProblems;

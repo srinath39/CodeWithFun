@@ -2,20 +2,62 @@ import { useState } from "react";
 
 const AuthForm = () => {
     const [isLogin, setIsLogin] = useState(true);
-    const [formData, setFormData] = useState({ email: "", password: "", firstName: "" ,lastName:""});
+    const [formData, setFormData] = useState({ email: "", password: "", firstName: "", lastName: "" });
 
     const toggleMode = () => setIsLogin(!isLogin);
 
     const handleChange = (e) => {
+        e.preventDefault();
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (isLogin) {
-            alert(`Logging in as ${formData.email}`);
+            try {
+                const responseData = await fetch(
+                    'http://localhost:3000/user/login',
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            email: formData.email,
+                            password: formData.password,
+                        }),
+                    }
+                );
+                const userData = await responseData.json();
+                if (!responseData.ok) {
+                    throw new Error(dataFetched.message | "User was not not logged In");
+                }
+                console.log(userData.userId, userData.token);
+            } catch (err) { }
+
         } else {
-            alert(`Registering user ${formData.username}`);
+            try {
+                const responseData = await fetch(
+                    'http://localhost:3000/user/register',
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            firstname: formData.firstName,
+                            lastname: formData.lastName,
+                            email: formData.email,
+                            password: formData.password,
+                        }),
+                    }
+                );
+                const userData = await responseData.json();
+                if (!responseData.ok) {
+                    throw new Error(dataFetched.message | "User was not not logged In");
+                }
+                console.log(userData.userId, userData.token);
+            } catch (err) { }
         }
     };
 

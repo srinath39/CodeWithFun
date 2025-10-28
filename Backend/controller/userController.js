@@ -24,7 +24,11 @@ const createNewUser = async (req, res, next) => {
     // save the user in the DB
     const newUser = await User.create({ firstname, lastname, email, password: hashPassword });
     if (newUser) {
-        return res.status(201).send("User registered successfully");
+        return res.status(201).json({
+            msg: "User registered successfully",
+            userId: newUser._id,
+            token: generateJwtToken(newUser)
+        });
     }
 };
 
@@ -49,17 +53,19 @@ const loginUser = async (req, res, next) => {
         return next(new HttpError("Password does'nt match with the Given email, please retry with correct password", 401));
     }
 
-    // generate a JWT token for user and send it 
-    const token = jwt.sign({ id: existingUser._id, email }, process.env.SECRET, { expiresIn: "1h" });
-
     // Send he response with JWT token 
     existingUser.password = undefined;
     return res.status(202).json({
         msg: "user login and JWT token generated successfully",
-        existingUser,
-        token
+        userId: existingUser._id,
+        token: generateJwtToken(existingUser)
     });
 };
+
+const generateJwtToken = (user) => {
+    const token = jwt.sign({ id: user._id, email: user.email }, process.env.SECRET, { expiresIn: "1h" });
+    return token;
+}
 
 
 const getUserCredentials = async (req, res, next) => {
