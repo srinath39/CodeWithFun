@@ -1,16 +1,29 @@
 
-const LanguageSelector = ({ selected, setSelected }) => {
-  const languages = ["C++", "Python", "JavaScript", "Java"];
+const LanguageSelector = ({ selectedLangExt, availableLanguages, setSelectedLangExt }) => {
 
+  const languageChangeHandler = (e) => {
+    console.log(e.target.value);
+    setSelectedLangExt(e.target.value);
+  }
+
+  if (availableLanguages == null) {
+    return (
+      <div>
+        <h1>No languages Available</h1>
+      </div>
+    );
+  }
   return (
     <div className="flex justify-end mb-3">
       <select
-        value={selected}
-        onChange={(e) => setSelected(e.target.value)}
+        value={selectedLangExt}
+        onChange={languageChangeHandler}
         className="border border-gray-300 rounded-lg px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-sky-400"
       >
-        {languages.map((lang) => (
-          <option key={lang}>{lang}</option>
+        {Object.entries(availableLanguages).map(([key, value]) => (   // convert the object into Arrays 
+          <option key={key} value={key}>
+            {value}
+          </option>
         ))}
       </select>
     </div>

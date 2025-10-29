@@ -43,7 +43,7 @@ const getProblemById = async (req, res, next) => {
 
     return res.status(200).json({
         msg: `Problem with Id ${problemId} retrieved successfully`,
-        codingProblem
+        codingProblem: codingProblem.toObject({getters:true})
     })
 };
 

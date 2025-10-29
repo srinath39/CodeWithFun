@@ -1,10 +1,13 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const AuthForm = () => {
     const [isLogin, setIsLogin] = useState(true);
     const [formData, setFormData] = useState({ email: "", password: "", firstName: "", lastName: "" });
 
     const toggleMode = () => setIsLogin(!isLogin);
+
+    const navigate = useNavigate();
 
     const handleChange = (e) => {
         e.preventDefault();
@@ -33,6 +36,7 @@ const AuthForm = () => {
                     throw new Error(dataFetched.message | "User was not not logged In");
                 }
                 console.log(userData.userId, userData.token);
+                navigate(`/`);
             } catch (err) { }
 
         } else {
@@ -57,6 +61,7 @@ const AuthForm = () => {
                     throw new Error(dataFetched.message | "User was not not logged In");
                 }
                 console.log(userData.userId, userData.token);
+                navigate(`/`);
             } catch (err) { }
         }
     };

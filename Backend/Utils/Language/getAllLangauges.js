@@ -4,4 +4,4 @@ const LANG = [['cpp', 'C++'],
 ['java', 'Java'],
 ['py', 'Python']];
 
-module.exports = new Map(LANG);
+module.exports = new Map(LANG);      // convert the array to Map 
