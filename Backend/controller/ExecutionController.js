@@ -8,7 +8,7 @@ const HttpError = require("../models/http-Error");
 
 
 const runCodeWithCompiler = async (req, res, next) => {
-    const { code, languageExt, input } = req.body;
+    const { languageExt, code, input } = req.body;
 
     // data validation
     // if user have'nt choosen any language , by default it should be any language example : c++
@@ -29,9 +29,10 @@ const runCodeWithCompiler = async (req, res, next) => {
         const filePath = generateFileWithCode(languagesMap.get(languageExt), languageExt, code);
         // this execution need to different for different Lanugages 
         let languageSpecificCommand = getCommandForASpecificLanguage(filePath, languageExt);
+        console.log(languageSpecificCommand.replace(process.env.INPUT_PLACEHOLDER, input.trim()));
         const output = await executeCode(input, languageSpecificCommand);
         return res.status(200).json({
-            CodeOutput: output
+            CodeOutput: output.trim()
         });
     } catch (error) {
         return next(new HttpError(error.message, error.errorCode));
@@ -47,7 +48,7 @@ const submitProblemCode = async (req, res, next) => {
         return next(new HttpError("problem Id Format is wrong, try with correct Id format", 400));
     }
 
-    const { code, languageExt } = req.body;
+    const { languageExt, code } = req.body;
     // if user have'nt choosen any language , by default it should be any language example : c++
     if (!languageExt) {
         languageExt = 'cpp';
@@ -81,14 +82,15 @@ const submitProblemCode = async (req, res, next) => {
         for (const testCase of testCasesArray) {
             const { input, expectedOutput } = testCase;
             const actualOutput = await executeCode(input, languageSpecificCommand);
-            if (expectedOutput != actualOutput) {
-                return res.status(404).json({ totalTestcases, testCasesPassed, verdict: `Wrong answer at test case ${testCasesPassed + 1}`, actualOutput });  // Do i need to send this to the Common error middleWare
+            if (expectedOutput.trim() != actualOutput.trim()) {
+                return res.status(200).json({ totalTestcases, testCasesPassed, verdictMsg: `${totalTestcases}/${testCasesPassed} test cases passed\nWrong answer at test case ${testCasesPassed + 1}` });  // Do i need to send this to the Common error middleWare
             }
             testCasesPassed = testCasesPassed + 1;
         }
         return res.status(200).json({
             totalTestcases,
-            verdict: "All test cases passed successfully"
+            testCasesPassed,
+            verdictMsg: `${totalTestcases}/${testCasesPassed} test cases passed`
         });
 
     } catch (error) {

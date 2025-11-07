@@ -27,7 +27,7 @@ const problemModelSchema = new mongoose.Schema({
         require: true,
         unique: true
     },
-    problemDescription: {
+    problemDescription: {   
         type: String,
         trim: true,
         require: true
