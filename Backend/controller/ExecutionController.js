@@ -29,7 +29,6 @@ const runCodeWithCompiler = async (req, res, next) => {
         const filePath = generateFileWithCode(languagesMap.get(languageExt), languageExt, code);
         // this execution need to different for different Lanugages 
         let languageSpecificCommand = getCommandForASpecificLanguage(filePath, languageExt);
-        console.log(languageSpecificCommand.replace(process.env.INPUT_PLACEHOLDER, input.trim()));
         const output = await executeCode(input, languageSpecificCommand);
         return res.status(200).json({
             CodeOutput: output.trim()
@@ -87,6 +86,15 @@ const submitProblemCode = async (req, res, next) => {
             }
             testCasesPassed = testCasesPassed + 1;
         }
+
+        // creation of submission record
+        // user Id   
+        // problem Id  
+        // result  
+        // runtime   
+        // language   
+        // submission time ( creation time of Submission record)   
+
         return res.status(200).json({
             totalTestcases,
             testCasesPassed,

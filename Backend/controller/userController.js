@@ -23,11 +23,21 @@ const createNewUser = async (req, res, next) => {
 
     // save the user in the DB
     const newUser = await User.create({ firstname, lastname, email, password: hashPassword });
+    const token = generateJwtToken(newUser);
     if (newUser) {
+
+        // cookie - a small file stored in browser 
+        // http-cookie is a cookie which protects from xss attacks 
+        res.cookie("token", token, {    // "token" is a cookie name 
+            httpOnly: true,       // cannot be accessed via JS
+            secure: false,        // set to true if using HTTPS
+            sameSite: "lax",      // helps prevent CSRF
+            maxAge: 60 * 60 * 1000, // 1 hour
+        });
+
         return res.status(201).json({
             msg: "User registered successfully",
-            userId: newUser._id,
-            token: generateJwtToken(newUser)
+            userId: newUser._id
         });
     }
 };
@@ -55,10 +65,18 @@ const loginUser = async (req, res, next) => {
 
     // Send he response with JWT token 
     existingUser.password = undefined;
+    const token = generateJwtToken(existingUser);
+
+    res.cookie("token", token, {
+        httpOnly: true,       // cannot be accessed via JS
+        secure: false,        // set to true if using HTTPS
+        sameSite: "lax",      // helps prevent CSRF
+        maxAge: 60 * 60 * 1000, // 1 hour
+    });
+
     return res.status(202).json({
         msg: "user login and JWT token generated successfully",
         userId: existingUser._id,
-        token: generateJwtToken(existingUser)
     });
 };
 
@@ -106,7 +124,6 @@ const updateUserDetails = async (req, res, next) => {
 
     // check the input data 
     const { firstname, lastname, email, password } = req.body;
-    console.log(req.body);
     if (!(firstname && lastname && email && password)) {
         return next(new HttpError("Please provide all credentials", 401));
     }

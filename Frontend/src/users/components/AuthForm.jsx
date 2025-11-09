@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const AuthForm = () => {
     const [isLogin, setIsLogin] = useState(true);
@@ -18,49 +19,47 @@ const AuthForm = () => {
         e.preventDefault();
         if (isLogin) {
             try {
-                const responseData = await fetch(
-                    'http://localhost:3000/user/login',
+                const response = await axios.post(
+                    "http://localhost:3000/user/login",
                     {
-                        method: "POST",
+                        email: formData.email,
+                        password: formData.password,
+                    },
+                    {
                         headers: {
                             "Content-Type": "application/json",
                         },
-                        body: JSON.stringify({
-                            email: formData.email,
-                            password: formData.password,
-                        }),
+                        withCredentials: true, // allows the backend to send cookies to the frontend and store it in browser 
+                        // if this is not included , the browser ignores the cookie 
                     }
                 );
-                const userData = await responseData.json();
-                if (!responseData.ok) {
-                    throw new Error(dataFetched.message | "User was not not logged In");
-                }
-                console.log(userData.userId, userData.token);
+
+                const userData = response.data; // axios automatically parses JSON
+                console.log(userData.msg, userData.userId);
                 navigate(`/`);
             } catch (err) { }
 
         } else {
             try {
-                const responseData = await fetch(
-                    'http://localhost:3000/user/register',
+                const response = await axios.post(
+                    "http://localhost:3000/user/register",
                     {
-                        method: "POST",
+                        firstname: formData.firstName,
+                        lastname: formData.lastName,
+                        email: formData.email,
+                        password: formData.password,
+                    },
+                    {
                         headers: {
                             "Content-Type": "application/json",
                         },
-                        body: JSON.stringify({
-                            firstname: formData.firstName,
-                            lastname: formData.lastName,
-                            email: formData.email,
-                            password: formData.password,
-                        }),
+                        withCredentials: true, // allows the backend to send cookies to the frontend and store it in browser 
+                        // if this is not included , the browser ignores the cookie 
                     }
                 );
-                const userData = await responseData.json();
-                if (!responseData.ok) {
-                    throw new Error(dataFetched.message | "User was not not logged In");
-                }
-                console.log(userData.userId, userData.token);
+
+                const userData = response.data;
+                console.log(userData.msg, userData.userId);
                 navigate(`/`);
             } catch (err) { }
         }

@@ -4,6 +4,7 @@ import ProblemDetails from '../components/ProblemDetails';
 import LanguageSelector from '../components/LanguageSelector';
 import CodeEditor from '../components/CodeEditor';
 import TabSection from '../components/TabSection';
+import axios from "axios";
 
 const ProblemPage = () => {
     const problemId = useParams().problemId;
@@ -19,15 +20,12 @@ const ProblemPage = () => {
     // useEffect for fetching Problem by ID 
     useEffect(() => {  // this will be running twice , as we are in Strict Mode ( Development)
         const fetchProblembyId = async () => {
-            console.log(`http://localhost:3000/problem/${problemId}`);
             try {
-                const response = await fetch(
-                    `http://localhost:3000/problem/${problemId}`
-                );
-                const dataFetched = await response.json();
-                if (!response.ok) {
-                    throw new Error(dataFetched.message | "problem cannot be fetched");
-                }
+                const response = await axios.get(`http://localhost:3000/problem/${problemId}`, {
+                    withCredentials: true,
+                });
+
+                const dataFetched = response.data;
                 const loadedProblem = dataFetched.codingProblem;
                 // update the state 
                 setCurrentProblem(loadedProblem);
@@ -44,13 +42,10 @@ const ProblemPage = () => {
     useEffect(() => {  // this will be running twice , as we are in Strict Mode ( Development)
         const fetchAllLanguages = async () => {
             try {
-                const response = await fetch(
-                    'http://localhost:3000/languages/all'
-                );
-                const dataFetched = await response.json();
-                if (!response.ok) {
-                    throw new Error(dataFetched.message | "langauges cannot be fetched");
-                }
+                const response = await axios.get("http://localhost:3000/languages/all", {
+                    withCredentials: true,
+                });
+                const dataFetched = response.data;
                 const loadedLanguages = dataFetched.lang;
                 // update the state 
                 setAvailableLanguages(loadedLanguages);
@@ -66,23 +61,22 @@ const ProblemPage = () => {
     // async handler for running the code 
     const handleRunCodeInCompiler = async () => {
         try {
-            const response = await fetch(
-                'http://localhost:3000/code/run', {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
+            const response = await axios.post(
+                "http://localhost:3000/code/run",
+                {
                     languageExt: selectedLangExt,
                     code,
-                    input
-                })
-            }
+                    input,
+                },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    withCredentials: true,
+                }
             );
-            const dataFetched = await response.json();
-            if (!response.ok) {
-                throw new Error(dataFetched.message | "unable to run the code");
-            }
+            const dataFetched = response.data;
+
             const CodeOutput = dataFetched.CodeOutput;
             console.log(CodeOutput);
             // update the state 
@@ -97,22 +91,21 @@ const ProblemPage = () => {
     // async handler for submitting the code 
     const handleSubmitCodeInCompiler = async () => {
         try {
-            const response = await fetch(
-                `http://localhost:3000/code/${problemId}/submit`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
+            const response = await axios.post(
+                `http://localhost:3000/code/${problemId}/submit`,
+                {
                     languageExt: selectedLangExt,
-                    code
-                })
-            }
+                    code,
+                },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    withCredentials: true,
+                }
             );
-            const dataFetched = await response.json();
-            if (!response.ok) {
-                throw new Error(dataFetched.message | "unable to submit the code");
-            }
+            const dataFetched = response.data;
+
             // update the state 
             setActiveTab("verdict");
             setVerdict(dataFetched);

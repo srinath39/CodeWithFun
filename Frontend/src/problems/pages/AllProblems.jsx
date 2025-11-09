@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
+import axios from 'axios';
 
 import ProblemCard from '../components/ProblemCard';
 const DSAProblems = () => {
@@ -11,13 +12,11 @@ const DSAProblems = () => {
     useEffect(() => {  // this will be running twice , if we are in Strict Mode ( Development)
         const fetchDSAProblems = async () => {
             try {
-                const response = await fetch(
-                    'http://localhost:3000/problem/all'
-                );
-                const dataFetched = await response.json();
-                if (!response.ok) {
-                    throw new Error(dataFetched.message | "All problems cannot be fetched");
-                }
+                const response = await axios.get("http://localhost:3000/problem/all", {
+                    withCredentials: true,
+                });
+
+                const dataFetched = response.data;
                 const problemsRetrieved = dataFetched.allProblems;
                 // update the state 
                 setDsaProblems([...problemsRetrieved]);   // push all the array values in a new Array 

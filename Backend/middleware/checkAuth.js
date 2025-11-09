@@ -4,16 +4,15 @@ dotenv.config();
 
 const verfiyUser = (req, res, next) => {
     try {
-        const intiToken = req.headers.authorization;   // "Bearer Token"  
-        const token = intiToken.split(' ')[1];   // Actual token 
-        console.log(token);
+        const token = req.cookies.token;   
         if (!token) {
             throw new Error("Authentication failed !");
         }
-        req.userData = jwt.verify(token, process.env.SECRET);
+        req.userId= jwt.verify(token, process.env.SECRET).id;
+        console.log(req.userId);
         next();
     } catch (err) {
-        next(err);
+        return next(err);
     }
 }
 module.exports = verfiyUser;
