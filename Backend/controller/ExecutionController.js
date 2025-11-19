@@ -5,7 +5,8 @@ const { executeCode } = require("../Utils/fileUtils/executeCode");
 const { getCommandForASpecificLanguage } = require("../Utils/fileUtils/generateCommand");
 const languagesMap = require("../Utils/Language/getAllLangauges");
 const HttpError = require("../models/http-Error");
-
+const { performance } = require('perf_hooks');
+const SubmissionModel = require("../models/submissionSchema");
 
 const runCodeWithCompiler = async (req, res, next) => {
     const { languageExt, code, input } = req.body;
@@ -41,6 +42,7 @@ const runCodeWithCompiler = async (req, res, next) => {
 
 const submitProblemCode = async (req, res, next) => {
     const problemId = req.params.problemId;
+    const userId = req.userId;
 
     // check the id follows correct format or not 
     if (!mongoose.Types.ObjectId.isValid(problemId)) {
@@ -78,28 +80,47 @@ const submitProblemCode = async (req, res, next) => {
         // run the test Cases
         const totalTestcases = testCasesArray.length;
         let testCasesPassed = 0;
+        const startTime = performance.now();
         for (const testCase of testCasesArray) {
             const { input, expectedOutput } = testCase;
             const actualOutput = await executeCode(input, languageSpecificCommand);
-            if (expectedOutput.trim() != actualOutput.trim()) {
-                return res.status(200).json({ totalTestcases, testCasesPassed, verdictMsg: `${totalTestcases}/${testCasesPassed} test cases passed\nWrong answer at test case ${testCasesPassed + 1}` });  // Do i need to send this to the Common error middleWare
+            if (expectedOutput.trim() == actualOutput.trim()) {
+                testCasesPassed = testCasesPassed + 1;
+            } else {
+                break;
             }
-            testCasesPassed = testCasesPassed + 1;
         }
+        const endTime = performance.now();
+        const duration = endTime - startTime;
 
-        // creation of submission record
-        // user Id   
-        // problem Id  
-        // result  
-        // runtime   
-        // language   
-        // submission time ( creation time of Submission record)   
+        const isAlltestCasesPassed = testCasesPassed === totalTestcases;
 
-        return res.status(200).json({
-            totalTestcases,
-            testCasesPassed,
-            verdictMsg: `${totalTestcases}/${testCasesPassed} test cases passed`
+        // Creating a submission record 
+        let submissionResult = isAlltestCasesPassed ? 'Accepted' : 'Wrong Answer';
+        let submissionRuntime = `${duration.toFixed(3)} ms`;
+
+        const newSubmission = new SubmissionModel({
+            userId,
+            problemId,
+            result: submissionResult,
+            runtime: submissionRuntime,
+            language: languagesMap.get(languageExt),
         });
+
+        // save the record
+        await newSubmission.save();
+
+
+        // response to the frontend
+        if (isAlltestCasesPassed) {
+            return res.status(200).json({
+                totalTestcases,
+                testCasesPassed,
+                verdictMsg: `${totalTestcases}/${testCasesPassed} test cases passed`
+            });
+        } else {
+            return res.status(200).json({ totalTestcases, testCasesPassed, verdictMsg: `${totalTestcases}/${testCasesPassed} test cases passed\nWrong answer at test case ${testCasesPassed + 1}` });  // Do i need to send this to the Common error middleWare
+        }
 
     } catch (error) {
         return next(new HttpError(error.message | "Something Went Wrong in Submission , Please Try again", 500));

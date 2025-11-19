@@ -7,6 +7,7 @@ const userRoute = require("./routes/userRoute.js");
 const problemRoute = require("./routes/problemRoute.js");
 const languageRoute = require("./routes/languageRoute.js");
 const codeExecutionRoute = require("./routes/codeExecutionRoute.js");
+const submissionRoute = require("./routes/submissionRoute.js");
 const cors = require("cors");
 const dotenv = require("dotenv");
 dotenv.config();
@@ -32,13 +33,15 @@ app.use(cookieParser());    // From frontend to Backend ( Filter in request url)
 
 app.use('/user', userRoute);
 
-app.use(checkAuth);
+// app.use(checkAuth);   // testing purpose 
 
 app.use('/problem', problemRoute);
 
 app.use('/languages', languageRoute);
 
 app.use('/code', codeExecutionRoute);
+
+app.use('/submission', submissionRoute);
 
 
 

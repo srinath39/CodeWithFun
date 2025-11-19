@@ -4,12 +4,11 @@ dotenv.config();
 
 const verfiyUser = (req, res, next) => {
     try {
-        const token = req.cookies.token;   
+        const token = req.cookies.token;
         if (!token) {
             throw new Error("Authentication failed !");
         }
-        req.userId= jwt.verify(token, process.env.SECRET).id;
-        console.log(req.userId);
+        req.userId = jwt.verify(token, process.env.SECRET).id;
         next();
     } catch (err) {
         return next(err);
