@@ -35,7 +35,6 @@ const SubmissionDetails = ({ submissions }) => {
                                         <tr
                                             key={i}
                                             className={`
-                                                hover:bg-gray-50 
                                                 ${isAccepted ? "bg-green-100" : "bg-red-100"}
                                             `}
                                         >
