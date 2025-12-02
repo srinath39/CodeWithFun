@@ -17,10 +17,10 @@ const LanguageSelector = ({ selectedLangExt, availableLanguages, setSelectedLang
       <select
         value={selectedLangExt}
         onChange={languageChangeHandler}
-        className="border border-gray-300 rounded-lg px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-sky-400"
+        className="border border-gray-300 rounded-lg px-3 py-2 text-gray-700 bg-white shadow-md focus:outline-none focus:ring-0 focus:ring-grey-400"
       >
         {Object.entries(availableLanguages).map(([ext, lang]) => (   // convert the object into Arrays 
-          <option key={ext} value={ext}>
+          <option key={ext} value={ext} >
             {lang}
           </option>
         ))}

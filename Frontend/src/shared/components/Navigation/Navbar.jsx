@@ -12,7 +12,7 @@ const Navbar = () => {
         navigate("/");
     }
     return (
-        <nav className="flex justify-between items-center bg-gray-900 text-white px-8 py-4 shadow-md sticky top-0 z-50">
+        <nav className="flex justify-between items-center bg-gray-900 text-white px-8 py-4 shadow-md">
             <Link to="/" className="text-2xl font-bold tracking-wide">
                 CodeWithFun
             </Link>
