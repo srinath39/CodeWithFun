@@ -1,5 +1,5 @@
 const VerdictTab = ({ verdict }) => {
-   if (!verdict) {
+    if (!verdict) {
         return (
             <div className="w-full h-32 border border-gray-300 rounded-lg p-3 bg-gray-50 flex justify-center items-center">
                 <p className="text-gray-500 text-center font-medium">

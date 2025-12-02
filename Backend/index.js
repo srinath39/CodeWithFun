@@ -2,7 +2,6 @@ const express = require('express');
 const app = express();
 const cookieParser = require("cookie-parser");
 const { DBConnection } = require("./database/db.js");
-const checkAuth = require("./middleware/checkAuth.js");
 const userRoute = require("./routes/userRoute.js");
 const problemRoute = require("./routes/problemRoute.js");
 const languageRoute = require("./routes/languageRoute.js");
@@ -15,6 +14,7 @@ dotenv.config();
 app.listen(process.env.PORT, () => {
         console.log(`Server running on port number ${process.env.PORT}`);
 });
+
 
 DBConnection();
 
@@ -30,10 +30,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());    // From frontend to Backend ( Filter in request url) 
 
 
-
 app.use('/user', userRoute);
-
-// app.use(checkAuth);   // testing purpose 
 
 app.use('/problem', problemRoute);
 

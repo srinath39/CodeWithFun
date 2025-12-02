@@ -86,6 +86,16 @@ const generateJwtToken = (user) => {
 }
 
 
+const logoutUser = (req, res) => {
+    res.clearCookie("token");
+    return res.json({ message: "Logged out" });
+};
+
+const tokenSuccessMsg = (req, res) => {
+    return res.json({ message: "User authenticated" });
+}
+
+
 const getUserCredentials = async (req, res, next) => {
     // retrive the id from the url 
     const userId = req.params.userId;
@@ -171,4 +181,4 @@ const deleteUserFromDatabase = async (req, res, next) => {
     })
 };
 
-module.exports = { createNewUser, loginUser, getUserCredentials, updateUserDetails, deleteUserFromDatabase };
+module.exports = { createNewUser, loginUser, logoutUser, tokenSuccessMsg, getUserCredentials, updateUserDetails, deleteUserFromDatabase };

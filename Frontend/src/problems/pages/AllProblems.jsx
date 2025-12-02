@@ -1,18 +1,20 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
+import { AuthContext } from '../../shared/components/context/AuthContext';
 
 import ProblemCard from '../components/ProblemCard';
-const DSAProblems = () => {
+const AllProblems = () => {
 
     const [dsaProblems, setDsaProblems] = useState([]);
+    const { isAuthenticated } = useContext(AuthContext);
 
     const navigate = useNavigate();
 
     useEffect(() => {  // this will be running twice , if we are in Strict Mode ( Development)
         const fetchDSAProblems = async () => {
             try {
-                const response = await axios.get("http://localhost:3000/problem/all", {
+                const response = await axios.get(`${import.meta.env.VITE_API_BACKEND_URL}/problem/all`, {
                     withCredentials: true,
                 });
 
@@ -30,11 +32,15 @@ const DSAProblems = () => {
 
 
     const handleCardClick = (problem) => {
-        navigate(`/problem/${problem.id}`);
+        if (isAuthenticated) {
+            navigate(`/problem/${problem.id}`);
+        } else {
+            navigate("/auth");
+        }
     };
 
     return (
-        <div className="min-h-screen bg-gray-100 p-10">
+        <div className="min-h-screen bg-gray-100 p-10 pt-24">
 
             <div className="max-w-3xl mx-auto">
                 {dsaProblems.map((problem) => (
@@ -47,13 +53,6 @@ const DSAProblems = () => {
             </div>
         </div>
     );
-
-    // Entire Problem 
-    // id 
-    // title
-    // problemDescription
-    // difficult
-    // testCases 
 };
 
-export default DSAProblems;
+export default AllProblems;

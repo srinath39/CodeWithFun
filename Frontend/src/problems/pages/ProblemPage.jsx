@@ -21,7 +21,7 @@ const ProblemPage = () => {
     useEffect(() => {  // this will be running twice , as we are in Strict Mode ( Development)
         const fetchProblembyId = async () => {
             try {
-                const response = await axios.get(`http://localhost:3000/problem/${problemId}`, {
+                const response = await axios.get(`${import.meta.env.VITE_API_BACKEND_URL}/problem/${problemId}`, {
                     withCredentials: true,
                 });
 
@@ -42,7 +42,7 @@ const ProblemPage = () => {
     useEffect(() => {  // this will be running twice , as we are in Strict Mode ( Development)
         const fetchAllLanguages = async () => {
             try {
-                const response = await axios.get("http://localhost:3000/languages/all", {
+                const response = await axios.get(`${import.meta.env.VITE_API_BACKEND_URL}/languages/all`, {
                     withCredentials: true,
                 });
                 const dataFetched = response.data;
@@ -62,7 +62,7 @@ const ProblemPage = () => {
     const handleRunCodeInCompiler = async () => {
         try {
             const response = await axios.post(
-                "http://localhost:3000/code/run",
+                `${import.meta.env.VITE_API_BACKEND_URL}/code/run`,
                 {
                     languageExt: selectedLangExt,
                     code,
@@ -78,7 +78,6 @@ const ProblemPage = () => {
             const dataFetched = response.data;
 
             const CodeOutput = dataFetched.CodeOutput;
-            console.log(CodeOutput);
             // update the state 
             setActiveTab("output");
             setOutput(CodeOutput);
@@ -92,7 +91,7 @@ const ProblemPage = () => {
     const handleSubmitCodeInCompiler = async () => {
         try {
             const response = await axios.post(
-                `http://localhost:3000/code/${problemId}/submit`,
+                `${import.meta.env.VITE_API_BACKEND_URL}/code/${problemId}/submit`,
                 {
                     languageExt: selectedLangExt,
                     code,

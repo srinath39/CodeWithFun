@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { AuthContext } from "../../shared/components/context/AuthContext";
 
 const AuthForm = () => {
     const [isLogin, setIsLogin] = useState(true);
     const [formData, setFormData] = useState({ email: "", password: "", firstName: "", lastName: "" });
+    const { setIsAuthenticated } = useContext(AuthContext);
 
     const toggleMode = () => setIsLogin(!isLogin);
 
@@ -20,7 +22,7 @@ const AuthForm = () => {
         if (isLogin) {
             try {
                 const response = await axios.post(
-                    "http://localhost:3000/user/login",
+                    `${import.meta.env.VITE_API_BACKEND_URL}/user/login`,
                     {
                         email: formData.email,
                         password: formData.password,
@@ -35,14 +37,14 @@ const AuthForm = () => {
                 );
 
                 const userData = response.data; // axios automatically parses JSON
-                console.log(userData.msg, userData.userId);
+                setIsAuthenticated(true);
                 navigate(`/`);
             } catch (err) { }
 
         } else {
             try {
                 const response = await axios.post(
-                    "http://localhost:3000/user/register",
+                    `${import.meta.env.VITE_API_BACKEND_URL}/user/register`,
                     {
                         firstname: formData.firstName,
                         lastname: formData.lastName,
@@ -59,7 +61,7 @@ const AuthForm = () => {
                 );
 
                 const userData = response.data;
-                console.log(userData.msg, userData.userId);
+                setIsAuthenticated(true);
                 navigate(`/`);
             } catch (err) { }
         }

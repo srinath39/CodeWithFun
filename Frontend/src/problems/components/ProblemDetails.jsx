@@ -1,4 +1,6 @@
 import DifficultyLevel from '../../shared/Utils/DifficultyLevelHelper'
+import { Link } from 'react-router-dom';
+import SubmissionType from "../../shared/Utils/SubmissionTypeHelper";
 
 
 const ProblemDetails = ({ problem }) => {
@@ -12,10 +14,25 @@ const ProblemDetails = ({ problem }) => {
     return (
         <div className="bg-white rounded-xl shadow-md p-6 h-full overflow-y-auto">
             <h2 className="text-2xl font-bold text-gray-800 mb-2">{problem.title}</h2>
+            <div className="flex gap-3 mb-6">
+                <Link
+                    to={`/submissions/${SubmissionType.ALL_MY_PROBLEM_SUBMISSIONS}/${problem.id}`}
+                    className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+                >
+                    My Submissions
+                </Link>
+
+                <Link
+                    to={`/submissions/${SubmissionType.ALL_PROBLEM_SUBMISSIONS}/${problem.id}`}
+                    className="px-3 py-1.5 text-sm bg-gray-800 text-white rounded-md hover:bg-gray-900 transition"
+                >
+                    All Submissions
+                </Link>
+            </div>
             <p className="text-sm text-gray-600 mb-4">
                 Difficulty:{" "}
                 <span
-                    className={`font-semibold ${DifficultyLevel(problem.difficult) === "Easy"
+                    className={`font - semibold ${DifficultyLevel(problem.difficult) === "Easy"
                         ? "text-green-600"
                         : DifficultyLevel(problem.difficult) === "Medium"
                             ? "text-yellow-600"
