@@ -12,22 +12,22 @@ if (!fs.existsSync(dirCodes)) {
 }
 
 
-const getCommandForASpecificLanguage = (filePath, languageExt) => {
+const getCommandForASpecificLanguage = (filePath, languageExt, input) => {
     // creating a file name from filePath
     const fileDir = path.dirname(filePath);
     const fileNameWithExt = path.basename(filePath);
     const fileName = fileNameWithExt.split('.')[0];
     let outputPath;
     let outputCommand;
-    const input = process.env.INPUT_PLACEHOLDER;
+    const inputCmd = !input ? "" : `echo ${process.env.INPUT_PLACEHOLDER} | `;
 
     switch (languageExt) {
         case 'java':
             // No longer the  class Name and the file name need to be the same (As java version 11 or above doesn't require file to be compiled we can directly run the file using filename.java )
-            outputCommand = `cd ${fileDir} && echo ${input} | java ${fileNameWithExt}`;
+            outputCommand = `cd ${fileDir} && ${inputCmd}java ${fileNameWithExt}`;
             break;
         case 'py':
-            outputCommand = `cd ${fileDir} && echo ${input} | python ${fileNameWithExt}`;
+            outputCommand = `cd ${fileDir} && ${inputCmd}python ${fileNameWithExt}`;
             break;
         default:  // cpp 
             outputPath = path.join(dirCodes, `${fileName}.out`);

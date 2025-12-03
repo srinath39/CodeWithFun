@@ -122,7 +122,7 @@ const ProblemPage = () => {
                 <ProblemDetails problem={currentProblem} />
                 <div className="flex flex-col">
                     <LanguageSelector selectedLangExt={selectedLangExt} availableLanguages={availableLanguages} setSelectedLangExt={setSelectedLangExt} />
-                    <CodeEditor code={code} setCode={setCode} />
+                    <CodeEditor code={code} setCode={setCode} languageExt={selectedLangExt} />
                     <TabSection
                         input={input}
                         setInput={setInput}
@@ -134,7 +134,7 @@ const ProblemPage = () => {
                     <div className="flex justify-end gap-3">
                         <button
                             onClick={handleRunCodeInCompiler}
-                            className="bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-2 rounded-lg transition"
+                            className="bg-gray-800 hover:bg-gray-950 text-white px-7 py-2 rounded-lg transition"
                         >
                             Run
                         </button>

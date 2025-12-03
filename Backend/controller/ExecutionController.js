@@ -21,15 +21,11 @@ const runCodeWithCompiler = async (req, res, next) => {
         return next(new HttpError("The code is Empty, please provide the code", 404));
     }
 
-    if (!input) {
-        input = '';
-    }
-
     // Automation in creating a file(Language Specfic) in codes folder and copying the code in it and return the file path 
     try {
         const filePath = generateFileWithCode(languagesMap.get(languageExt), languageExt, code);
         // this execution need to different for different Lanugages 
-        let languageSpecificCommand = getCommandForASpecificLanguage(filePath, languageExt);
+        let languageSpecificCommand = getCommandForASpecificLanguage(filePath, languageExt, input);
         const output = await executeCode(input, languageSpecificCommand);
         return res.status(200).json({
             CodeOutput: output.trim()
