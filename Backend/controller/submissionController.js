@@ -6,7 +6,7 @@ const HttpError = require("../models/http-Error");
 // retreving all my submissioms of all problems 
 const getAllMySubmissions = async (req, res, next) => {
     const userId = req.userId;
-    await getSubmissionresponseHelper({ userId }, res, next);
+    await getSubmissionresponseHelper({ userId }, res, next); 
 };
 
 // retreving all my submissions of a specific problem

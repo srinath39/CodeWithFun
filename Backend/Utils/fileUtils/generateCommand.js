@@ -31,7 +31,7 @@ const getCommandForASpecificLanguage = (filePath, languageExt, input) => {
             break;
         default:  // cpp 
             outputPath = path.join(dirCodes, `${fileName}.out`);
-            outputCommand = `cd ${fileDir} && g++ ${fileNameWithExt} -o ${outputPath} && cd ${dirCodes} && echo ${input} | ${fileName}.out`;
+            outputCommand = `cd ${fileDir} && g++ ${fileNameWithExt} -o ${outputPath} && cd ${dirCodes} && ${inputCmd}${fileName}.out`;
             break;
     }   // if the command need to execute in Windows sysem use .exe /  if it need to be exceuted in docker since it is a linus env we need to use .out
     return outputCommand;

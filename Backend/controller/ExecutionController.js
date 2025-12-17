@@ -70,7 +70,7 @@ const submitProblemCode = async (req, res, next) => {
         // Automation in creating a file(Language Specfic) in codes folder and copying the code in it and return the file path 
         const filePath = generateFileWithCode(languagesMap.get(languageExt), languageExt, code);
         // get Language Specific Command 
-        let languageSpecificCommand = getCommandForASpecificLanguage(filePath, languageExt);
+        let languageSpecificCommand = getCommandForASpecificLanguage(filePath, languageExt, true);
 
 
         // run the test Cases
