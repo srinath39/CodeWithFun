@@ -12,11 +12,11 @@ const runCodeWithCompiler = async (req, res, next) => {
     const { languageExt, code, input } = req.body;
 
     // data validation
-    // if user have'nt choosen any language , by default it should be any language example : c++
+    // if user have'nt choosen any language ,   by default it should be any language example : c++
     if (!languageExt) {
         languageExt = 'cpp';
     }
-    // if no code is provided , we need to throw an error
+    // if no code is provided irrespective of any language, we need to throw an error
     if (!code) {
         return next(new HttpError("The code is Empty, please provide the code", 404));
     }
