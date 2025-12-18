@@ -112,10 +112,10 @@ const submitProblemCode = async (req, res, next) => {
             return res.status(200).json({
                 totalTestcases,
                 testCasesPassed,
-                verdictMsg: `${totalTestcases}/${testCasesPassed} test cases passed`
-            });
+                verdictMsg: `${testCasesPassed}/${totalTestcases} test cases passed`
+            }); 
         } else {
-            return res.status(200).json({ totalTestcases, testCasesPassed, verdictMsg: `${totalTestcases}/${testCasesPassed} test cases passed\nWrong answer at test case ${testCasesPassed + 1}` });  // Do i need to send this to the Common error middleWare
+            return res.status(200).json({ totalTestcases, testCasesPassed, verdictMsg: `${testCasesPassed}/${totalTestcases} test cases passed\nWrong answer at test case ${testCasesPassed + 1}` });  // Do i need to send this to the Common error middleWare
         }
 
     } catch (error) {
