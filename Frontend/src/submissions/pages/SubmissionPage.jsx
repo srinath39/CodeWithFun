@@ -50,7 +50,7 @@ const SubmissionPage = () => {
             }
         };
         fetchSubmissionsRecords();
-    }, []);
+    }, [problemId, subType]);
 
     return (
         <SubmissionDetails submissions={submissionsRecords} />

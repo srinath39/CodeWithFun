@@ -13,7 +13,6 @@ const CodeEditor = ({ code, setCode, languageExt }) => {
     };
 
     const languageForEditor = (ext) => {
-        console.log(languageMapForCodeEditor[ext] || ext);
         return languageMapForCodeEditor[ext] || ext;
     };
 

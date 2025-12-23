@@ -16,6 +16,7 @@ const ProblemPage = () => {
     const [output, setOutput] = useState("");
     const [verdict, setVerdict] = useState(null);
     const [activeTab, setActiveTab] = useState("input");
+    const [aiReview, setAiReview] = useState("");
 
     // useEffect for fetching Problem by ID 
     useEffect(() => {  // this will be running twice , as we are in Strict Mode ( Development)
@@ -114,7 +115,21 @@ const ProblemPage = () => {
         }
     }
 
-
+    const handleAiReview = async () => {
+        try {
+            const response = await axios.post(`${import.meta.env.VITE_API_BACKEND_URL}/review/ai-review`, { code, description: currentProblem.problemDescription },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    withCredentials: true,
+                });
+            setActiveTab("aiReview");
+            setAiReview(response.data.aiReview);
+        } catch (err) {
+            console.log(err.message);
+        }
+    };
 
     return (
         <div className="min-h-screen flex flex-col bg-gray-100">
@@ -130,6 +145,7 @@ const ProblemPage = () => {
                         verdict={verdict}
                         activeTab={activeTab}
                         setActiveTab={setActiveTab}
+                        aiReview={aiReview}
                     />
                     <div className="flex justify-end gap-3">
                         <button
@@ -143,6 +159,12 @@ const ProblemPage = () => {
                             className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg transition"
                         >
                             Submit
+                        </button>
+                        <button
+                            onClick={handleAiReview}
+                            className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-lg transition disabled:opacity-50"
+                        >
+                            AI Review
                         </button>
                     </div>
                 </div>

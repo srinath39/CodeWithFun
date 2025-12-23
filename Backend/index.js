@@ -7,6 +7,7 @@ const problemRoute = require("./routes/problemRoute.js");
 const languageRoute = require("./routes/languageRoute.js");
 const codeExecutionRoute = require("./routes/codeExecutionRoute.js");
 const submissionRoute = require("./routes/submissionRoute.js");
+const reviewRoute = require("./routes/reviewRoute.js");
 const cors = require("cors");
 const dotenv = require("dotenv");
 dotenv.config();
@@ -40,7 +41,7 @@ app.use('/code', codeExecutionRoute);
 
 app.use('/submission', submissionRoute);
 
-
+app.use('/review', reviewRoute)
 
 
 app.use((error, req, res, next) => {
