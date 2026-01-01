@@ -2,3 +2,6 @@
 node_modules
 codes
 executableCodeFiles
+aws
+awscliv2.zip
+Dockerfile

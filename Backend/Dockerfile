@@ -3,5 +3,5 @@ WORKDIR /Backend
 RUN apk update && apk add --no-cache g++ python3 openjdk21
 COPY . .
 RUN npm install
-EXPOSE 8080
+EXPOSE 5000
 CMD ["node","index.js"]

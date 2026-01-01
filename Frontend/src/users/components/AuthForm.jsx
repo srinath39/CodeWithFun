@@ -7,8 +7,12 @@ const AuthForm = () => {
     const [isLogin, setIsLogin] = useState(true);
     const [formData, setFormData] = useState({ email: "", password: "", firstName: "", lastName: "" });
     const { setIsAuthenticated } = useContext(AuthContext);
+    const [errors, setErrors] = useState({});
 
-    const toggleMode = () => setIsLogin(!isLogin);
+    const toggleMode = () => {
+        setIsLogin(!isLogin);
+        setErrors({});
+    };
 
     const navigate = useNavigate();
 
@@ -17,8 +21,50 @@ const AuthForm = () => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+
+    const validate = () => {
+        const newErrors = {};
+
+        // Email validation
+        if (!formData.email.trim()) {
+            newErrors.email = "Email is required";
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+            newErrors.email = "Invalid email format";
+        }
+
+        // Password validation
+        if (!formData.password) {
+            newErrors.password = "Password is required";
+        } else if (formData.password.length < 4) {
+            newErrors.password = "Password must be at least 6 characters";
+        }
+
+        // First & Last name (only for register)
+        if (!isLogin) {
+            if (!formData.firstName.trim()) {
+                newErrors.firstName = "First name is required";
+            } else if (!/^[A-Za-z]+$/.test(formData.firstName)) {
+                newErrors.firstName = "First name should contain only letters";
+            }
+
+            if (!formData.lastName.trim()) {
+                newErrors.lastName = "Last name is required";
+            } else if (!/^[A-Za-z]+$/.test(formData.lastName)) {
+                newErrors.lastName = "Last name should contain only letters";
+            }
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!validate()) return;
+
         if (isLogin) {
             try {
                 const response = await axios.post(
@@ -86,6 +132,9 @@ const AuthForm = () => {
                             required
                             className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                         />
+                        {errors.firstName && (
+                            <p className="text-red-500 text-sm">{errors.firstName}</p>
+                        )}
                     </div>
                 )}
 
@@ -101,6 +150,9 @@ const AuthForm = () => {
                             required
                             className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                         />
+                        {errors.lastName && (
+                            <p className="text-red-500 text-sm">{errors.lastName}</p>
+                        )}
                     </div>
                 )}
 
@@ -115,6 +167,9 @@ const AuthForm = () => {
                         required
                         className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                     />
+                    {errors.email && (
+                        <p className="text-red-500 text-sm">{errors.email}</p>
+                    )}
                 </div>
 
                 <div>
@@ -128,6 +183,9 @@ const AuthForm = () => {
                         required
                         className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                     />
+                    {errors.password && (
+                        <p className="text-red-500 text-sm">{errors.password}</p>
+                    )}
                 </div>
 
                 <button

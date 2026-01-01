@@ -20,7 +20,7 @@ app.listen(process.env.PORT, () => {
 DBConnection();
 
 app.use(cors({
-        origin: "http://localhost:5173", // your React app URL
+        origin: process.env.FRONTEND_URL_FOR_CORS, // your React app URL
         credentials: true, // allow cookies to be sent
 }));
 
