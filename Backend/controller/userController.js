@@ -30,8 +30,9 @@ const createNewUser = async (req, res, next) => {
         // http-cookie is a cookie which protects from xss attacks 
         res.cookie("token", token, {    // "token" is a cookie name 
             httpOnly: true,       // cannot be accessed via JS
-            secure: false,        // set to true if using HTTPS
-            sameSite: "lax",      // helps prevent CSRF
+            secure: true,        // set to true if using HTTPS
+            sameSite: "None",
+            path: "/",
             maxAge: 60 * 60 * 1000, // 1 hour
         });
 
@@ -69,8 +70,9 @@ const loginUser = async (req, res, next) => {
 
     res.cookie("token", token, {
         httpOnly: true,       // cannot be accessed via JS
-        secure: false,        // set to true if using HTTPS
-        sameSite: "lax",      // helps prevent CSRF
+        secure: true,        // set to true if using HTTPS
+        sameSite: "None",
+        path: "/",
         maxAge: 60 * 60 * 1000, // 1 hour
     });
 
