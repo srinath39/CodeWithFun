@@ -3,6 +3,8 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const HttpError = require("../models/http-Error");
+const dotenv = require("dotenv");
+dotenv.config();
 
 
 const createNewUser = async (req, res, next) => {
@@ -28,13 +30,15 @@ const createNewUser = async (req, res, next) => {
 
         // cookie - a small file stored in browser 
         // http-cookie is a cookie which protects from xss attacks 
-        res.cookie("token", token, {    // "token" is a cookie name 
-            httpOnly: true,       // cannot be accessed via JS
-            secure: true,        // set to true if using HTTPS
-            sameSite: "None",
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: true,        // REQUIRED on HTTPS
+            sameSite: "none",    // REQUIRED for cross-site
+            domain: `.${process.env.COOKIE_DOMAIN}`, // prevent vanishing of cookie in browser refresh 
             path: "/",
-            maxAge: 60 * 60 * 1000, // 1 hour
+            maxAge: 7 * 24 * 60 * 60 * 1000
         });
+
 
         return res.status(201).json({
             msg: "User registered successfully",
