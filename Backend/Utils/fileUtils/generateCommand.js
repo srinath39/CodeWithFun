@@ -12,29 +12,34 @@ if (!fs.existsSync(dirCodes)) {
 }
 
 
-const getCommandForASpecificLanguage = (filePath, languageExt, input) => {
-    // creating a file name from filePath
+const getCommandForASpecificLanguage = (filePath, languageExt) => {
     const fileDir = path.dirname(filePath);
     const fileNameWithExt = path.basename(filePath);
     const fileName = fileNameWithExt.split('.')[0];
     let outputPath;
-    let outputCommand;
-    const inputCmd = !input ? "" : `echo ${process.env.INPUT_PLACEHOLDER} | `;
+    let commandSet = {
+        compileCommand: null,
+        runCommand: null,
+        cleanupDirs: [fileDir],
+        cleanupPaths: [],
+    };
 
     switch (languageExt) {
         case 'java':
-            // No longer the  class Name and the file name need to be the same (As java version 11 or above doesn't require file to be compiled we can directly run the file using filename.java )
-            outputCommand = `cd ${fileDir} && ${inputCmd}java ${fileNameWithExt}`;
+            commandSet.compileCommand = `cd "${fileDir}" && javac "${fileNameWithExt}"`;
+            commandSet.runCommand = `cd "${fileDir}" && java "${fileName}"`;
             break;
         case 'py':
-            outputCommand = `cd ${fileDir} && ${inputCmd}python ${fileNameWithExt}`;
+            commandSet.runCommand = `cd "${fileDir}" && python "${fileNameWithExt}"`;
             break;
         default:  // cpp 
             outputPath = path.join(dirCodes, `${fileName}.out`);
-            outputCommand = `cd ${fileDir} && g++ ${fileNameWithExt} -o ${outputPath} && cd ${dirCodes} && ${inputCmd}${fileName}.out`;
+            commandSet.compileCommand = `cd "${fileDir}" && g++ "${fileNameWithExt}" -o "${outputPath}"`;
+            commandSet.runCommand = `"${outputPath}"`;
+            commandSet.cleanupPaths.push(outputPath);
             break;
-    }   // if the command need to execute in Windows sysem use .exe /  if it need to be exceuted in docker since it is a linus env we need to use .out
-    return outputCommand;
+    }
+    return commandSet;
 };
 
 module.exports = { getCommandForASpecificLanguage };

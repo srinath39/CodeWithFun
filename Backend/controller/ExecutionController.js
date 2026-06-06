@@ -1,3 +1,4 @@
+const fs = require("fs");
 const mongoose = require("mongoose");
 const ProblemModel = require("../models/problemSchema");
 const { generateFileWithCode } = require("../Utils/fileUtils/generateFile");
@@ -8,33 +9,56 @@ const HttpError = require("../models/http-Error");
 const { performance } = require('perf_hooks');
 const SubmissionModel = require("../models/submissionSchema");
 
+const cleanupGeneratedFiles = (commandInfo = {}) => {
+    const { cleanupDirs = [], cleanupPaths = [] } = commandInfo;
+    for (const dir of cleanupDirs) {
+        try {
+            fs.rmSync(dir, { recursive: true, force: true });
+        } catch (error) {
+            // ignore cleanup failures
+        }
+    }
+    for (const file of cleanupPaths) {
+        try {
+            fs.rmSync(file, { force: true });
+        } catch (error) {
+            // ignore cleanup failures
+        }
+    }
+};
+
 const runCodeWithCompiler = async (req, res, next) => {
-    const { languageExt, code, input } = req.body;
+    let { languageExt, code, input } = req.body;
 
     // data validation
-    // if user have'nt choosen any language ,   by default it should be any language example : c++
     if (!languageExt) {
         languageExt = 'cpp';
     }
-    // if no code is provided irrespective of any language, we need to throw an error
     if (!code) {
         return next(new HttpError("The code is Empty, please provide the code", 404));
     }
 
-    // Automation in creating a file(Language Specfic) in codes folder and copying the code in it and return the file path 
+    const filePath = generateFileWithCode(languageExt, code);
+    const languageSpecificCommand = getCommandForASpecificLanguage(filePath, languageExt);
+
     try {
-        const filePath = generateFileWithCode(languagesMap.get(languageExt), languageExt, code);
-        // this execution need to different for different Lanugages 
-        let languageSpecificCommand = getCommandForASpecificLanguage(filePath, languageExt, input);
-        const output = await executeCode(input, languageSpecificCommand);
+        const output = await executeCode(input, languageSpecificCommand, languageExt);
         return res.status(200).json({
             CodeOutput: output.trim()
         });
     } catch (error) {
-        return next(new HttpError(error.message, error.errorCode));
+        if (error && error.type) {
+            return next(new HttpError({
+                errorType: error.type,
+                errorMessage: error.message,
+                errorOutput: error.errorOutput || '',
+            }, error.errorCode || 400));
+        }
+        return next(new HttpError(error.message || "Execution failed", error.errorCode || 500));
+    } finally {
+        cleanupGeneratedFiles(languageSpecificCommand);
     }
 };
-
 
 const submitProblemCode = async (req, res, next) => {
     const problemId = req.params.problemId;
@@ -45,12 +69,10 @@ const submitProblemCode = async (req, res, next) => {
         return next(new HttpError("problem Id Format is wrong, try with correct Id format", 400));
     }
 
-    const { languageExt, code } = req.body;
-    // if user have'nt choosen any language , by default it should be any language example : c++
+    let { languageExt, code } = req.body;
     if (!languageExt) {
         languageExt = 'cpp';
     }
-    // if no code is provided , we need to throw an error
     if (!code) {
         return next(new HttpError("The code is Empty, please provide the code", 404));
     }
@@ -64,24 +86,33 @@ const submitProblemCode = async (req, res, next) => {
 
         const testCasesArray = codingProblem.testCases;
         if (!testCasesArray.length) {
-            new Error("Problem does'nt have any test cases to run");
+            return next(new HttpError("Problem doesn't have any test cases to run", 400));
         }
 
-        // Automation in creating a file(Language Specfic) in codes folder and copying the code in it and return the file path 
-        const filePath = generateFileWithCode(languagesMap.get(languageExt), languageExt, code);
-        // get Language Specific Command 
-        let languageSpecificCommand = getCommandForASpecificLanguage(filePath, languageExt, true);
+        const filePath = generateFileWithCode(languageExt, code);
+        const languageSpecificCommand = getCommandForASpecificLanguage(filePath, languageExt);
 
-
-        // run the test Cases
         const totalTestcases = testCasesArray.length;
         let testCasesPassed = 0;
         const startTime = performance.now();
-        for (const testCase of testCasesArray) {
+        for (const [index, testCase] of testCasesArray.entries()) {
             const { input, expectedOutput } = testCase;
-            const actualOutput = await executeCode(input, languageSpecificCommand);
-            if (expectedOutput.trim() == actualOutput.trim()) {
-                testCasesPassed = testCasesPassed + 1;
+            let actualOutput;
+            try {
+                actualOutput = await executeCode(input, languageSpecificCommand, languageExt);
+            } catch (error) {
+                if (error && error.type) {
+                    return res.status(error.errorCode || 400).json({
+                        errorType: error.type,
+                        errorMessage: error.message,
+                        errorOutput: error.errorOutput || '',
+                        failedTestCase: index + 1,
+                    });
+                }
+                return next(new HttpError(error.message || "Execution failed", error.errorCode || 500));
+            }
+            if (expectedOutput.trim() === actualOutput.trim()) {
+                testCasesPassed += 1;
             } else {
                 break;
             }
@@ -113,15 +144,23 @@ const submitProblemCode = async (req, res, next) => {
                 totalTestcases,
                 testCasesPassed,
                 verdictMsg: `${testCasesPassed}/${totalTestcases} test cases passed`
-            }); 
+            });
         } else {
             return res.status(200).json({ totalTestcases, testCasesPassed, verdictMsg: `${testCasesPassed}/${totalTestcases} test cases passed\nWrong answer at test case ${testCasesPassed + 1}` });  // Do i need to send this to the Common error middleWare
         }
 
     } catch (error) {
-        return next(new HttpError(error.message | "Something Went Wrong in Submission , Please Try again", 500));
+        if (error && error.type) {
+            return res.status(error.errorCode || 400).json({
+                errorType: error.type,
+                errorMessage: error.message,
+                errorOutput: error.errorOutput || '',
+            });
+        }
+        return next(new HttpError(error.message || "Something Went Wrong in Submission, Please try again", 500));
+    } finally {
+        cleanupGeneratedFiles(languageSpecificCommand);
     }
 };
 
-
-module.exports = { runCodeWithCompiler, submitProblemCode };  
+module.exports = { runCodeWithCompiler, submitProblemCode };

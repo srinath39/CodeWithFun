@@ -10,7 +10,7 @@ const submissionRoute = require("./routes/submissionRoute.js");
 const reviewRoute = require("./routes/reviewRoute.js");
 const cors = require("cors");
 const dotenv = require("dotenv");
-dotenv.config();
+dotenv.config(); 
 
 app.listen(process.env.PORT, () => {
         console.log(`Server running on port number ${process.env.PORT}`);
@@ -46,7 +46,8 @@ app.use('/review', reviewRoute)
 
 app.use((error, req, res, next) => {
         if (!res.headerSent && error) {
-                return res.status(error.code || 500).json({ message: error.message || 'An unknown error occured' });
+                const payload = { message: error.message || error.customMessage || 'An unknown error occured' };
+                return res.status(error.code || 500).json(payload);
         }
 });
 

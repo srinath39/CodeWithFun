@@ -5,19 +5,38 @@ const uniqueName = require("uniqid");
 // Automation in creating a Directory for file storage
 const dirCodes = path.join(__dirname, 'codes');
 
-// ONly if the directory does'nt exit create it 
+// Only if the directory doesn't exist create it
 if (!fs.existsSync(dirCodes)) {
-    fs.mkdirSync(dirCodes, { recursive: true });   // {recursive: "true"}
+    fs.mkdirSync(dirCodes, { recursive: true });
 }
 
-const generateFileWithCode = (language, languageExtension, code) => {
+const getJavaFilename = (code) => {
+    const publicClassMatch = code.match(/\bpublic\s+class\s+([A-Za-z_$][A-Za-z0-9_$]*)/);
+    if (publicClassMatch) {
+        return `${publicClassMatch[1]}.java`;
+    }
+    const classMatch = code.match(/\bclass\s+([A-Za-z_$][A-Za-z0-9_$]*)/);
+    if (classMatch) {
+        return `${classMatch[1]}.java`;
+    }
+    return 'Main.java';
+};
 
-    // we need to keep the file name same as problem title ,for now just keep the uniqueId as a file name 
+const generateFileWithCode = (languageExtension, code) => {
+
     const jobId = uniqueName();
-    const fileName = `${jobId}-${language}.${languageExtension}`;
+    const languageDir = path.join(dirCodes, languageExtension);
+    // const jobDir = path.join(languageDir, jobId);
+    if (!fs.existsSync(languageDir)) {
+        fs.mkdirSync(languageDir, { recursive: true });
+    }
 
-    // file path 
-    const codeFilePath = path.join(dirCodes, fileName);
+    let fileName = `${jobId}.${languageExtension}`;
+    if (languageExtension === 'java') {
+        fileName = getJavaFilename(code);
+    }
+
+    const codeFilePath = path.join(languageDir, fileName);
 
     // create the file and copy the code
     fs.writeFileSync(codeFilePath, code);

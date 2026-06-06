@@ -34,7 +34,7 @@ const createNewUser = async (req, res, next) => {
             httpOnly: true,
             secure: true,        // REQUIRED on HTTPS
             sameSite: "none",    // REQUIRED for cross-site
-            domain: `.${process.env.COOKIE_DOMAIN}`, // prevent vanishing of cookie in browser refresh 
+            // domain: `.${process.env.COOKIE_DOMAIN}`, // prevent vanishing of cookie in browser refresh 
             path: "/",
             maxAge: 7 * 24 * 60 * 60 * 1000
         });

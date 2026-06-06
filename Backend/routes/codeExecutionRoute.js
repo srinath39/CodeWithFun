@@ -3,7 +3,7 @@ const router = express.Router();
 const checkAuth = require("../middleware/checkAuth");
 const { runCodeWithCompiler, submitProblemCode } = require('../controller/ExecutionController');
 
-router.post('/run', checkAuth, runCodeWithCompiler);
+router.post('/run', runCodeWithCompiler);   // add checkAuth if you send request from browser 
 
 router.post('/:problemId/submit', checkAuth, submitProblemCode);
 
