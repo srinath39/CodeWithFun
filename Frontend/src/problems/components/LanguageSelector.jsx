@@ -1,8 +1,16 @@
 
-const LanguageSelector = ({ selectedLangExt, availableLanguages, setSelectedLangExt }) => {
+const LanguageSelector = ({ selectedLangExt, availableLanguages, setSelectedLangExt, isLoadingLanguages }) => {
 
   const languageChangeHandler = (e) => {
     setSelectedLangExt(e.target.value);
+  }
+
+  if (isLoadingLanguages) {
+    return (
+      <div className="mb-3">
+        <div className="h-10 bg-gray-300 rounded-lg animate-pulse w-32"></div>
+      </div>
+    );
   }
 
   if (availableLanguages == null) {

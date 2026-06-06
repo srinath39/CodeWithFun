@@ -11,6 +11,7 @@ const AuthForm = () => {
     const [touched, setTouched] = useState({});
     const [passwordStrength, setPasswordStrength] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
+    const [formError, setFormError] = useState("");
 
     const toggleMode = () => {
         setIsLogin(!isLogin);
@@ -18,6 +19,7 @@ const AuthForm = () => {
         setTouched({});
         setPasswordStrength(0);
         setIsLoading(false);
+        setFormError("");
     };
 
     const navigate = useNavigate();
@@ -156,6 +158,7 @@ const AuthForm = () => {
 
         if (!validate()) return;
 
+        setFormError("");
         setIsLoading(true);
 
         if (isLogin) {
@@ -180,6 +183,8 @@ const AuthForm = () => {
                 navigate(`/`);
             } catch (err) {
                 setIsLoading(false);
+                const errorMessage = err.response?.data?.message || err.message || "Login failed. Please try again.";
+                setFormError(errorMessage);
             }
 
         } else {
@@ -206,6 +211,8 @@ const AuthForm = () => {
                 navigate(`/`);
             } catch (err) {
                 setIsLoading(false);
+                const errorMessage = err.response?.data?.message || err.message || "Registration failed. Please try again.";
+                setFormError(errorMessage);
             }
         }
     };
@@ -215,6 +222,26 @@ const AuthForm = () => {
             <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
                 {isLogin ? "Sign In" : "Create an New Account"}
             </h2>
+
+            {formError && (
+                <div className="mb-4 p-4 bg-red-50 border border-red-300 rounded-lg flex items-start gap-3">
+                    <svg className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    </svg>
+                    <div className="flex-1">
+                        <p className="text-red-800 font-medium text-sm">{formError}</p>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={() => setFormError("")}
+                        className="text-red-400 hover:text-red-600 transition"
+                    >
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                        </svg>
+                    </button>
+                </div>
+            )}
 
             <form className="space-y-5" onSubmit={handleSubmit}>
                 {!isLogin && (
@@ -335,27 +362,35 @@ const AuthForm = () => {
                 <button
                     type="submit"
                     disabled={isLoading}
-                    className={`w-full text-white py-2 rounded-lg font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
+                    className={`w-full text-white py-3 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 shadow-lg transform hover:scale-105 active:scale-95 ${
                         isLoading
-                            ? "bg-gray-400 cursor-not-allowed"
-                            : "bg-green-600 hover:bg-green-700"
+                            ? "bg-gradient-to-r from-gray-400 to-gray-500 cursor-not-allowed shadow-md"
+                            : isLogin 
+                            ? "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-blue-500/50"
+                            : "bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 shadow-emerald-500/50"
                     }`}
                 >
                     {isLoading && (
-                        <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                        <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></div>
                     )}
-                    {isLoading ? (isLogin ? "Logging in..." : "Registering...") : (isLogin ? "Login" : "Register")}
+                    <span className="tracking-wide">
+                        {isLoading ? (isLogin ? "Logging in..." : "Registering...") : (isLogin ? "Login" : "Register")}
+                    </span>
                 </button>
             </form>
 
-            <p className="text-center text-gray-600 mt-4">
+            <p className="text-center text-gray-700 mt-6 text-sm">
                 {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
                 <button
                     type="button"
                     onClick={toggleMode}
-                    className="text-green-600 font-semibold hover:underline"
+                    className={`font-bold transition-all duration-300 hover:opacity-80 ${
+                        isLogin 
+                            ? "text-emerald-600 hover:text-emerald-700" 
+                            : "text-blue-600 hover:text-blue-700"
+                    }`}
                 >
-                    {isLogin ? "Register" : "Login"}
+                    {isLogin ? "Sign Up" : "Login"}
                 </button>
             </p>
         </div>
