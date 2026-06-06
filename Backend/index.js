@@ -45,7 +45,7 @@ app.use('/review', reviewRoute)
 
 
 app.use((error, req, res, next) => {
-        if (!res.headerSent && error) {
+        if (!res.headersSent && error) {
                 const payload = { message: error.message || error.customMessage || 'An unknown error occured' };
                 return res.status(error.code || 500).json(payload);
         }

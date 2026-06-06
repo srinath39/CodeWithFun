@@ -13,7 +13,7 @@ const ProblemPage = () => {
     const [currentProblem, setCurrentProblem] = useState(null);
     const [code, setCode] = useState(getPlaceholderCode("cpp"));
     const [input, setInput] = useState("");
-    const [output, setOutput] = useState("");
+    const [output, setOutput] = useState({});
     const [verdict, setVerdict] = useState(null);
     const [activeTab, setActiveTab] = useState("input");
     const [aiReview, setAiReview] = useState("");
@@ -151,10 +151,13 @@ body {
             const CodeOutput = dataFetched.CodeOutput;
             // update the state 
             setActiveTab("output");
-            setOutput(CodeOutput);
+            setOutput({result: CodeOutput, status : response.status});
         } catch (err) {
             // Handle 4XX and 5XX errors in Fronted ( Create seperate UI for these)
-            console.log(err.message);
+
+            const errorOutput = err.response.data.message;
+            setActiveTab("output");
+            setOutput({result: errorOutput,status : err.response.status});
         } finally {
             setIsLoadingOutput(false);
         }
@@ -181,10 +184,12 @@ body {
 
             // update the state 
             setActiveTab("verdict");
-            setVerdict(dataFetched);
+            setVerdict({ ...dataFetched, status: response.status });
         } catch (err) {
             // Handle 4XX and 5XX errors in Fronted ( Create seperate UI for these)
-            console.log(err.message);
+            const errorMessage = err.response?.data?.message || err.message || 'Failed to submit code';
+            setActiveTab("verdict");
+            setVerdict({ verdictMsg: errorMessage, status: err.response?.status || 500, totalTestcases: 0, testCasesPassed: 0 });
         } finally {
             setIsLoadingVerdict(false);
         }
@@ -201,9 +206,11 @@ body {
                     withCredentials: true,
                 });
             setActiveTab("aiReview");
-            setAiReview(response.data.aiReview);
+            setAiReview({ content: response.data.aiReview, status: response.status });
         } catch (err) {
-            console.log(err.message);
+            const errorMessage = err.response?.data?.message || err.message || 'Failed to generate AI review';
+            setActiveTab("aiReview");
+            setAiReview({ content: errorMessage, status: err.response?.status || 500 });
         } finally {
             setIsLoadingAiReview(false);
         }
@@ -242,25 +249,35 @@ body {
                         isLoadingVerdict={isLoadingVerdict}
                         isLoadingAiReview={isLoadingAiReview}
                     />
-                    <div className="flex justify-end gap-3">
-                        <button
-                            onClick={handleRunCodeInCompiler}
-                            className="bg-gray-800 hover:bg-gray-950 text-white px-7 py-2 rounded-lg transition"
-                        >
-                            Run
-                        </button>
-                        <button
-                            onClick={handleSubmitCodeInCompiler}
-                            className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg transition"
-                        >
-                            Submit
-                        </button>
-                        <button
-                            onClick={handleAiReview}
-                            className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-lg transition disabled:opacity-50"
-                        >
-                            AI Review
-                        </button>
+                    <div>
+                        {(isLoadingOutput || isLoadingVerdict || isLoadingAiReview) && (
+                            <div className="h-2 bg-gray-300 rounded-full overflow-hidden mb-3">
+                                <div className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500 animate-pulse"></div>
+                            </div>
+                        )}
+                        <div className="flex justify-end gap-3">
+                            <button
+                                onClick={handleRunCodeInCompiler}
+                                disabled={isLoadingOutput || isLoadingVerdict || isLoadingAiReview}
+                                className="bg-gray-800 hover:bg-gray-950 disabled:bg-gray-600 text-white px-7 py-2 rounded-lg transition disabled:cursor-not-allowed"
+                            >
+                                {isLoadingOutput ? 'Running...' : 'Run'}
+                            </button>
+                            <button
+                                onClick={handleSubmitCodeInCompiler}
+                                disabled={isLoadingOutput || isLoadingVerdict || isLoadingAiReview}
+                                className="bg-green-600 hover:bg-green-700 disabled:bg-green-500 text-white px-5 py-2 rounded-lg transition disabled:cursor-not-allowed"
+                            >
+                                {isLoadingVerdict ? 'Submitting...' : 'Submit'}
+                            </button>
+                            <button
+                                onClick={handleAiReview}
+                                disabled={isLoadingOutput || isLoadingVerdict || isLoadingAiReview}
+                                className="bg-purple-600 hover:bg-purple-700 disabled:bg-purple-500 text-white px-5 py-2 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {isLoadingAiReview ? 'Reviewing...' : 'AI Review'}
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
