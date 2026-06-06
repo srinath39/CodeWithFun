@@ -59,3 +59,5 @@ const getAiReviewErrorMessage = (statusCode) => {
   };
   return errorMessages[statusCode] || 'Failed to generate AI review. Please try again.';
 };
+
+export default AiReviewTab;
