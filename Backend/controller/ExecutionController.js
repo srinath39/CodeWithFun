@@ -10,7 +10,7 @@ const { performance } = require('perf_hooks');
 const SubmissionModel = require("../models/submissionSchema");
 
 const cleanupGeneratedFiles = (commandInfo = {}) => {
-    const { cleanupDirs = [], cleanupPaths = [] } = commandInfo;
+    const { cleanupDirs = [], cleanupExecDirs = [] } = commandInfo;
     for (const dir of cleanupDirs) {
         try {
             fs.rmSync(dir, { recursive: true, force: true });
@@ -18,9 +18,9 @@ const cleanupGeneratedFiles = (commandInfo = {}) => {
             // ignore cleanup failures
         }
     }
-    for (const file of cleanupPaths) {
+    for (const dir of cleanupExecDirs) {
         try {
-            fs.rmSync(file, { force: true });
+            fs.rmSync(dir, { recursive: true, force: true });
         } catch (error) {
             // ignore cleanup failures
         }

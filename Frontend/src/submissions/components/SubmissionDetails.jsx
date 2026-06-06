@@ -1,4 +1,4 @@
-const SubmissionDetails = ({ submissions }) => {
+const SubmissionDetails = ({ submissions, isLoading }) => {
     return (
         <div className="p-6 bg-gray-100 min-h-screen flex justify-center">
             <div className="w-full max-w-6xl">
@@ -6,6 +6,17 @@ const SubmissionDetails = ({ submissions }) => {
                 <h1 className="text-3xl font-bold mb-6 text-gray-800 text-center">
                     My Submissions
                 </h1>
+
+                {isLoading && (
+                    <div className="w-full mb-6">
+                        <div className="flex items-center gap-2">
+                            <div className="flex-1 h-1.5 bg-gray-300 rounded-full overflow-hidden">
+                                <div className="h-full bg-green-500 rounded-full w-1/3 animate-pulse"></div>
+                            </div>
+                            <div className="h-1.5 bg-blue-500 rounded-full w-1/12 animate-pulse"></div>
+                        </div>
+                    </div>
+                )}
 
                 <div className="overflow-x-auto shadow-xl rounded-xl bg-white">
                     <table className="min-w-full text-left border-collapse border border-gray-300">
@@ -21,7 +32,19 @@ const SubmissionDetails = ({ submissions }) => {
                         </thead>
 
                         <tbody>
-                            {submissions.length === 0 ? (
+                            {isLoading ? (
+                                // Skeleton loading rows
+                                Array(5).fill(0).map((_, i) => (
+                                    <tr key={i} className="bg-gray-50 animate-pulse">
+                                        <td className="p-4 border border-gray-300"><div className="h-4 bg-gray-300 rounded w-24"></div></td>
+                                        <td className="p-4 border border-gray-300"><div className="h-4 bg-gray-300 rounded w-32"></div></td>
+                                        <td className="p-4 border border-gray-300"><div className="h-4 bg-gray-300 rounded w-20"></div></td>
+                                        <td className="p-4 border border-gray-300"><div className="h-4 bg-gray-300 rounded w-16"></div></td>
+                                        <td className="p-4 border border-gray-300"><div className="h-4 bg-gray-300 rounded w-20"></div></td>
+                                        <td className="p-4 border border-gray-300"><div className="h-4 bg-gray-300 rounded w-32"></div></td>
+                                    </tr>
+                                ))
+                            ) : submissions.length === 0 ? (
                                 <tr>
                                     <td colSpan="6" className="p-6 text-center text-gray-500 border border-gray-300">
                                         No submissions found

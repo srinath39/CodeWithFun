@@ -21,7 +21,7 @@ const getCommandForASpecificLanguage = (filePath, languageExt) => {
         compileCommand: null,
         runCommand: null,
         cleanupDirs: [fileDir],
-        cleanupPaths: [],
+        cleanupExecDirs: [],
     };
 
     switch (languageExt) {
@@ -36,7 +36,7 @@ const getCommandForASpecificLanguage = (filePath, languageExt) => {
             outputPath = path.join(dirCodes, `${fileName}.out`);
             commandSet.compileCommand = `cd "${fileDir}" && g++ "${fileNameWithExt}" -o "${outputPath}"`;
             commandSet.runCommand = `"${outputPath}"`;
-            commandSet.cleanupPaths.push(outputPath);
+            commandSet.cleanupExecDirs.push(dirCodes);
             break;
     }
     return commandSet;

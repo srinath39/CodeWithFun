@@ -6,6 +6,7 @@ import axios from "axios";
 
 const SubmissionPage = () => {
     const [submissionsRecords, setSubmissionsRecords] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
     const urlParams = useParams();   // It is of a string , convert it to a number and use it.
 
     const subType = Number(urlParams.submissionType);
@@ -35,6 +36,7 @@ const SubmissionPage = () => {
     // useEffect for fetching submissions records  
     useEffect(() => {  // this will be running twice , as we are in Strict Mode ( Development)
         const fetchSubmissionsRecords = async () => {
+            setIsLoading(true);
             try {
                 const response = await axios.get(getSubmissionURL(subType, problemId), {
                     withCredentials: true,
@@ -47,13 +49,15 @@ const SubmissionPage = () => {
             } catch (err) {
                 // Handle 4XX and 5XX errors in Fronted ( Create seperate UI for these)
                 console.log(err.message);
+            } finally {
+                setIsLoading(false);
             }
         };
         fetchSubmissionsRecords();
     }, [problemId, subType]);
 
     return (
-        <SubmissionDetails submissions={submissionsRecords} />
+        <SubmissionDetails submissions={submissionsRecords} isLoading={isLoading} />
     )
 };
 
